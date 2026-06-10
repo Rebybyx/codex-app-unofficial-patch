@@ -1,5 +1,5 @@
 diff --git a/.SRCINFO b/.SRCINFO
-index 62a4296..e7318e4 100644
+index fb17634..46552b4 100644
 --- a/.SRCINFO
 +++ b/.SRCINFO
 @@ -5,6 +5,7 @@ pkgbase = codex-app-unofficial
@@ -12,16 +12,16 @@ index 62a4296..e7318e4 100644
  	depends = libnotify
 @@ -18,7 +19,9 @@ pkgbase = codex-app-unofficial
  	install = codex-app-unofficial.install
- 	source = codex-app-linux-26.602.40724-launcher.27-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.602.40724-launcher.27/codex-app-linux-26.602.40724-launcher.27-x64-linux-unpacked.tar.gz
- 	source = codex-app-linux-26.602.40724-launcher.27-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.602.40724-launcher.27/codex-app-linux-26.602.40724-launcher.27-x64.png
+ 	source = codex-app-linux-26.608.12217-launcher.27-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.608.12217-launcher.27/codex-app-linux-26.608.12217-launcher.27-x64-linux-unpacked.tar.gz
+ 	source = codex-app-linux-26.608.12217-launcher.27-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.608.12217-launcher.27/codex-app-linux-26.608.12217-launcher.27-x64.png
 +	source = patch-settings-overlap.mjs
- 	sha256sums = ff7b7d487e627bbccdf15962b876217e649085a37022a062c8e4d31b251707fc
+ 	sha256sums = 066d104a85c87cf5058b1ae24e04f4dbe63460f0be264c5b8caf8b90162b60ae
  	sha256sums = 1c926e380bfe6a50f40648dd9bc5de88da7271546491adf99ec72172e17df6a0
-+	sha256sums = 27025e0304af252f6af35e8e43f504b903ecba6059f10b85c6981ad4614230e0
++	sha256sums = 105a6348f093663c2d7bba3f5433996008d22f98e7d80353f03fd7605c9d132f
  
  pkgname = codex-app-unofficial
 diff --git a/PKGBUILD b/PKGBUILD
-index 2d73d80..2a538cc 100644
+index 3704bfa..f407e29 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
 @@ -5,6 +5,7 @@ pkgdesc='Unofficial Linux build of Codex from OpenAI'\''s Codex appcast feed.'
@@ -34,14 +34,14 @@ index 2d73d80..2a538cc 100644
  conflicts=('codex-app-linux-bin')
 @@ -13,12 +14,23 @@ install='codex-app-unofficial.install'
  source=(
-   'codex-app-linux-26.602.40724-launcher.27-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.602.40724-launcher.27/codex-app-linux-26.602.40724-launcher.27-x64-linux-unpacked.tar.gz'
-   'codex-app-linux-26.602.40724-launcher.27-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.602.40724-launcher.27/codex-app-linux-26.602.40724-launcher.27-x64.png'
+   'codex-app-linux-26.608.12217-launcher.27-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.608.12217-launcher.27/codex-app-linux-26.608.12217-launcher.27-x64-linux-unpacked.tar.gz'
+   'codex-app-linux-26.608.12217-launcher.27-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.608.12217-launcher.27/codex-app-linux-26.608.12217-launcher.27-x64.png'
 +  'patch-settings-overlap.mjs'
  )
  sha256sums=(
-   'ff7b7d487e627bbccdf15962b876217e649085a37022a062c8e4d31b251707fc'
+   '066d104a85c87cf5058b1ae24e04f4dbe63460f0be264c5b8caf8b90162b60ae'
    '1c926e380bfe6a50f40648dd9bc5de88da7271546491adf99ec72172e17df6a0'
-+  '27025e0304af252f6af35e8e43f504b903ecba6059f10b85c6981ad4614230e0'
++  '105a6348f093663c2d7bba3f5433996008d22f98e7d80353f03fd7605c9d132f'
  )
  
 +# 2026-06-06 苍朮
@@ -58,7 +58,7 @@ index 2d73d80..2a538cc 100644
    cp -a "${srcdir}/linux-unpacked/." "${pkgdir}/opt/codex-app-linux/"
 diff --git a/patch-settings-overlap.mjs b/patch-settings-overlap.mjs
 new file mode 100644
-index 0000000..6f1ddd6
+index 0000000..a7abb0f
 --- /dev/null
 +++ b/patch-settings-overlap.mjs
 @@ -0,0 +1,240 @@
@@ -72,8 +72,8 @@ index 0000000..6f1ddd6
 +
 +const SETTINGS_BRANCH_PATTERN = /if\([A-Za-z_$][A-Za-z0-9_$]*\)\{let t;/g;
 +const DISABLED_SETTINGS_BRANCH = "if(0){let t;";
-+const MAIN_WINDOW_BACKDROP = "e===`win32`&&!A2(t)?{backgroundColor:i2,backgroundMaterial:`mica`}:{backgroundColor:i2,backgroundMaterial:null}";
-+const OPAQUE_LINUX_WINDOW_BACKDROP = "e===`win32`&&!A2(t)?{backgroundColor:i2,backgroundMaterial:`mica`}:A2(t)?{backgroundColor:i2,backgroundMaterial:null}:{backgroundColor:r?a2:o2,backgroundMaterial:null}";
++const MAIN_WINDOW_BACKDROP = "function S3({platform:e,appearance:t,opaqueWindowSurfaceEnabled:n,prefersDarkColors:r}){return n?{backgroundColor:r?G4:K4,backgroundMaterial:e===`win32`?`none`:null}:e===`win32`&&!g3(t)?{backgroundColor:W4,backgroundMaterial:`mica`}:{backgroundColor:W4,backgroundMaterial:null}}";
++const OPAQUE_LINUX_WINDOW_BACKDROP = "function S3({platform:e,appearance:t,opaqueWindowSurfaceEnabled:n,prefersDarkColors:r}){return n?{backgroundColor:r?G4:K4,backgroundMaterial:e===`win32`?`none`:null}:e===`win32`&&!g3(t)?{backgroundColor:W4,backgroundMaterial:`mica`}:e===`linux`&&!g3(t)?{backgroundColor:r?G4:K4,backgroundMaterial:null}:{backgroundColor:W4,backgroundMaterial:null}}";
 +const TRANSPARENT_TOKEN_CHAIN = "--color-token-side-bar-background:var(--vscode-sideBar-background);--color-token-bg-primary:var(--color-token-side-bar-background);--color-token-diff-surface:var(--color-token-main-surface-primary)}";
 +const OPAQUE_TOKEN_CHAIN = "--color-token-side-bar-background:var(--color-background-surface-under);--color-token-bg-primary:var(--color-background-surface);--color-token-diff-surface:var(--color-token-main-surface-primary)}";
 +const ROOT_BACKGROUND_MARKER = "#root{height:100vh}";
@@ -166,7 +166,7 @@ index 0000000..6f1ddd6
 +}
 +
 +/**
-+ * 2026-06-06 苍朮
++ * 2026-06-10 苍朮
 + * Purpose: make Electron's Linux main windows use an opaque theme background while leaving overlay windows transparent.
 + * @param {string} bundlePath - Absolute path to the Electron main-process JavaScript bundle.
 + * @returns {{bundlePath: string, hash: string}} Patched bundle path and SHA256 hash.
@@ -242,7 +242,7 @@ index 0000000..6f1ddd6
 +}
 +
 +/**
-+ * 2026-06-06 苍朮
++ * 2026-06-10 苍朮
 + * Purpose: extract, patch, and repack Codex's app.asar while preserving native module unpacking.
 + * @param {string} appAsar - Path to the app.asar archive inside the extracted Linux bundle.
 + * @returns {Promise<void>} Resolves after the archive has been replaced with the patched version.
@@ -270,7 +270,7 @@ index 0000000..6f1ddd6
 +      ),
 +    );
 +    const cssResult = patchRendererCssBundle(
-+      await findBundle(join(extractedRoot, "webview", "assets"), /^app-main-[A-Za-z0-9_-]+\.css$/, (source) =>
++      await findBundle(join(extractedRoot, "webview", "assets"), /^app-[A-Za-z0-9_-]+\.css$/, (source) =>
 +        source.includes(TRANSPARENT_TOKEN_CHAIN) || source.includes(OPAQUE_TOKEN_CHAIN),
 +      ),
 +    );
