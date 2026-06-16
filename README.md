@@ -1,20 +1,3 @@
----
-title: codex-app-unofficial Linux patchset
-type: project-note
-type_name: 项目笔记
-status: active
-status_name: 进行中
-created: 2026-06-16
-updated: 2026-06-16
-author: 苍朮
-reviewed: false
-tags:
-  - codex-desktop
-  - codex-app-unofficial
-  - aur-patch
-  - linux
----
-
 # codex-app-unofficial Linux patchset
 
 这里保存了我本机用于修复 `codex-app-unofficial` Linux 桌面版的一组 AUR patch。
