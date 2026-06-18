@@ -1,72 +1,67 @@
 diff --git a/.SRCINFO b/.SRCINFO
-index 7228d55..1985038 100644
+index 83077b1..14af5a0 100644
 --- a/.SRCINFO
 +++ b/.SRCINFO
 @@ -1,7 +1,7 @@
  pkgbase = codex-app-unofficial
  	pkgdesc = Unofficial Linux build of Codex from OpenAI's Codex appcast feed.
- 	pkgver = 26.609.30741_launcher.27
+ 	pkgver = 26.611.62324_launcher.29
 -	pkgrel = 1
 +	pkgrel = 2
  	url = https://github.com/better-slop/codex-app-linux
  	arch = x86_64
  	license = custom
-@@ -20,8 +20,10 @@ pkgbase = codex-app-unofficial
- 	source = codex-app-linux-26.609.30741-launcher.27-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.609.30741-launcher.27/codex-app-linux-26.609.30741-launcher.27-x64-linux-unpacked.tar.gz
- 	source = codex-app-linux-26.609.30741-launcher.27-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.609.30741-launcher.27/codex-app-linux-26.609.30741-launcher.27-x64.png
- 	source = patch-settings-overlap.mjs
+@@ -18,7 +18,9 @@ pkgbase = codex-app-unofficial
+ 	install = codex-app-unofficial.install
+ 	source = codex-app-linux-26.611.62324-launcher.29-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.611.62324-launcher.29/codex-app-linux-26.611.62324-launcher.29-x64-linux-unpacked.tar.gz
+ 	source = codex-app-linux-26.611.62324-launcher.29-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.611.62324-launcher.29/codex-app-linux-26.611.62324-launcher.29-x64.png
 +	source = patch-avatar-overlay-linux.mjs
- 	sha256sums = 6273abcb5bb7f1b831682576b556810f884807003b011a7d65d8c77cf74fb5bf
+ 	sha256sums = a1c9817a5914da1ad30007df0efbad8852e92d1e722a945258a6a2016cd20cb3
  	sha256sums = 1c926e380bfe6a50f40648dd9bc5de88da7271546491adf99ec72172e17df6a0
- 	sha256sums = d4ae8564206d0e8ea3aba5973fcd103e4d2c30edb8acda5fc07166101541fae8
-+	sha256sums = a4f3f46cde7fa9038e6fe7cf7af75d5841147a641302df2106cf6d1dfb78f314
++	sha256sums = eac04e6664c09e6154a01858e5529f29616133957280b8fe5fb9b165e197e9c8
  
  pkgname = codex-app-unofficial
 diff --git a/PKGBUILD b/PKGBUILD
-index a0cc87a..d121b11 100644
+index 7e63a66..1bba9d7 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
 @@ -1,6 +1,6 @@
  pkgname='codex-app-unofficial'
- pkgver='26.609.30741_launcher.27'
+ pkgver='26.611.62324_launcher.29'
 -pkgrel=1
 +pkgrel=2
  pkgdesc='Unofficial Linux build of Codex from OpenAI'\''s Codex appcast feed.'
  arch=('x86_64')
  url='https://github.com/better-slop/codex-app-linux'
-@@ -15,20 +15,23 @@ source=(
-   'codex-app-linux-26.609.30741-launcher.27-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.609.30741-launcher.27/codex-app-linux-26.609.30741-launcher.27-x64-linux-unpacked.tar.gz'
-   'codex-app-linux-26.609.30741-launcher.27-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.609.30741-launcher.27/codex-app-linux-26.609.30741-launcher.27-x64.png'
-   'patch-settings-overlap.mjs'
+@@ -13,12 +13,22 @@ install='codex-app-unofficial.install'
+ source=(
+   'codex-app-linux-26.611.62324-launcher.29-x64-linux-unpacked.tar.gz::https://github.com/better-slop/codex-app-linux/releases/download/v26.611.62324-launcher.29/codex-app-linux-26.611.62324-launcher.29-x64-linux-unpacked.tar.gz'
+   'codex-app-linux-26.611.62324-launcher.29-x64.png::https://github.com/better-slop/codex-app-linux/releases/download/v26.611.62324-launcher.29/codex-app-linux-26.611.62324-launcher.29-x64.png'
 +  'patch-avatar-overlay-linux.mjs'
  )
  sha256sums=(
-   '6273abcb5bb7f1b831682576b556810f884807003b011a7d65d8c77cf74fb5bf'
+   'a1c9817a5914da1ad30007df0efbad8852e92d1e722a945258a6a2016cd20cb3'
    '1c926e380bfe6a50f40648dd9bc5de88da7271546491adf99ec72172e17df6a0'
-   'd4ae8564206d0e8ea3aba5973fcd103e4d2c30edb8acda5fc07166101541fae8'
-+  'a4f3f46cde7fa9038e6fe7cf7af75d5841147a641302df2106cf6d1dfb78f314'
++  'eac04e6664c09e6154a01858e5529f29616133957280b8fe5fb9b165e197e9c8'
  )
  
- # 2026-06-16 苍朮
--# Purpose: patch Codex's packaged Electron app before installation so Linux
--# windows and renderer surfaces no longer render transparent overlapping panes.
-+# Purpose: patch Codex's packaged Electron app before installation so Linux surfaces
-+# render opaquely and the avatar overlay remains clickable, selectable, and draggable.
- # Parameters: none; makepkg provides srcdir and the extracted app bundle.
--# Returns: exits non-zero if the expected Electron/CSS/settings anchors are missing.
-+# Returns: exits non-zero if the expected Electron/CSS/settings/avatar anchors are missing.
- prepare() {
-   node "${srcdir}/patch-settings-overlap.mjs" "${srcdir}/linux-unpacked/resources/app.asar"
++# 2026-06-18 苍朮
++# Purpose: patch Codex's packaged Electron app before installation so the Linux avatar overlay keeps a transparent shaped background.
++# Parameters: none; makepkg provides srcdir and the extracted app bundle.
++# Returns: exits non-zero if the expected current-upstream avatar overlay anchors are missing.
++prepare() {
 +  node "${srcdir}/patch-avatar-overlay-linux.mjs" "${srcdir}/linux-unpacked/resources/app.asar"
- }
- 
++}
++
  package() {
+   install -dm755 "${pkgdir}/opt/codex-app-linux"
+   cp -a "${srcdir}/linux-unpacked/." "${pkgdir}/opt/codex-app-linux/"
 diff --git a/patch-avatar-overlay-linux.mjs b/patch-avatar-overlay-linux.mjs
 new file mode 100644
-index 0000000..7ee2676
+index 0000000..4b172eb
 --- /dev/null
 +++ b/patch-avatar-overlay-linux.mjs
-@@ -0,0 +1,609 @@
+@@ -0,0 +1,296 @@
 +#!/usr/bin/env node
 +
 +import { execFileSync } from "node:child_process";
@@ -75,604 +70,291 @@ index 0000000..7ee2676
 +import { readdir } from "node:fs/promises";
 +import { basename, dirname, join } from "node:path";
 +
-+const POINTER_INTERACTIVITY_ANCHOR = "let t=!this.pointerInteractive;";
-+const LINUX_POINTER_INTERACTIVITY_POLICY = "let t=process.platform===`linux`?!1:!this.pointerInteractive;";
-+const APP_READY_ANCHOR = "let k=Date.now();await r.app.whenReady()";
-+const LINUX_TRANSPARENT_VISUALS_SWITCH = "process.platform===`linux`&&r.app.commandLine.appendSwitch(`enable-transparent-visuals`);";
-+const LINUX_TRANSPARENT_VISUALS_POLICY = `${LINUX_TRANSPARENT_VISUALS_SWITCH}${APP_READY_ANCHOR}`;
-+const TEMPORARY_STATE_ANIMATION_ANCHOR = "let r=[...n,...n,...n];return{frames:[...r,...x],loopStartIndex:r.length}";
-+const PERSISTENT_STATE_ANIMATION_POLICY = "return{frames:n,loopStartIndex:0}";
-+const TRAY_VISIBILITY_STORE_ANCHOR =
-+  "this.cancelMomentum(),this.layoutMode=t==null?`native`:`legacy`,this.initialPresentationState===`waiting-for-layout`";
-+const TRAY_VISIBILITY_STORE_POLICY =
-+  "this.cancelMomentum(),this.layoutMode=t==null?`native`:`legacy`,this.isTrayVisible=t,this.initialPresentationState===`waiting-for-layout`";
-+const WINDOW_SHAPE_SYNC_ANCHOR =
-+  "this.setWindowBounds(e,a.windowBounds,n,r),this.sendLayoutToRenderer(e)";
-+const WINDOW_SHAPE_SYNC_POLICY =
-+  "this.setWindowBounds(e,a.windowBounds,n,r),this.syncWindowShape(e),this.sendLayoutToRenderer(e)";
-+const WINDOW_SHAPE_METHOD_ANCHOR =
-+  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(N1(i,t))return;let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n),(r||!a)&&this.compositionHost.moveBackingCanvases()}sendLayoutToRenderer(e){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,layout:x1(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
-+const WINDOW_SHAPE_METHOD_LEGACY_POLICY =
-+  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(N1(i,t))return;let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n),(r||!a)&&this.compositionHost.moveBackingCanvases()}syncWindowShape(e){if(process.platform!==`linux`||e.isDestroyed()||this.layout==null)return;let t=this.isTrayVisible&&this.layout.tray!=null?[this.layout.mascot,this.layout.tray]:[this.layout.mascot],n=JSON.stringify(t);this.windowShapeSignature===n||(this.windowShapeSignature=n,e.setShape(t))}sendLayoutToRenderer(e){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,layout:x1(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
-+const WINDOW_SHAPE_METHOD_POLICY =
-+  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(N1(i,t))return;let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n),(r||!a)&&this.compositionHost.moveBackingCanvases()}syncWindowShape(e){if(process.platform!==`linux`||e.isDestroyed()||this.layout==null)return;let t=(this.isTrayVisible&&this.layout.tray!=null?[this.layout.mascot,this.layout.tray]:[this.layout.mascot]).map(e=>({x:e.left,y:e.top,width:e.width,height:e.height})),n=JSON.stringify(t);this.windowShapeSignature===n||(this.windowShapeSignature=n,e.setShape(t))}sendLayoutToRenderer(e){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,layout:x1(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
-+const WINDOW_SHAPE_METHOD_ANCHOR_26_609 =
-+  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(B0(i,t))return;let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n),(r||!a)&&this.compositionHost.moveBackingCanvases()}sendLayoutToRenderer(e){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,layout:O0(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
-+const WINDOW_SHAPE_METHOD_POLICY_26_609 =
-+  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(B0(i,t))return;let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n),(r||!a)&&this.compositionHost.moveBackingCanvases()}syncWindowShape(e){if(process.platform!==`linux`||e.isDestroyed()||this.layout==null)return;let t=(this.isTrayVisible&&this.layout.tray!=null?[this.layout.mascot,this.layout.tray]:[this.layout.mascot]).map(e=>({x:e.left,y:e.top,width:e.width,height:e.height})),n=JSON.stringify(t);this.windowShapeSignature===n||(this.windowShapeSignature=n,e.setShape(t))}sendLayoutToRenderer(e){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,layout:O0(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
-+const WINDOW_SHAPE_INIT_ANCHOR = "this.resolutionKey=null,this.traySize=null,process.platform===`darwin`?";
-+const WINDOW_SHAPE_INIT_POLICY =
-+  "this.resolutionKey=null,this.isTrayVisible=!1,this.windowShapeSignature=null,this.traySize=null,process.platform===`darwin`?";
-+const WINDOW_SHAPE_RESET_ANCHOR =
-+  "this.pointerInteractive=!1,this.mousePassthroughEnabled=!1,this.compositionHost.setOverlayWindow(null),this.broadcastOpenState()";
-+const WINDOW_SHAPE_RESET_POLICY =
-+  "this.pointerInteractive=!1,this.mousePassthroughEnabled=!1,this.isTrayVisible=!1,this.windowShapeSignature=null,this.compositionHost.setOverlayWindow(null),this.broadcastOpenState()";
-+const DYNAMIC_LAYOUT_ANCHORS = [
-+  "avatar-overlay-element-size-changed",
-+  "setElementSize",
-+  "applyLatestElementSizes",
-+  "applyLayout",
-+  "avatar-overlay-layout-changed",
-+];
-+const NATIVE_PAGE_SIZE_MESSAGE_ANCHOR =
-+  "s.dispatchMessage(`avatar-overlay-element-size-changed`,{mascot:e.mascot,tray:e.tray})";
-+const NATIVE_PAGE_SIZE_MESSAGE_POLICY =
-+  "s.dispatchMessage(`avatar-overlay-element-size-changed`,{isTrayVisible:e.tray!=null,mascot:e.mascot,tray:e.tray})";
-+const NATIVE_PAGE_SIZE_MESSAGE_ANCHOR_26_609 =
-+  "l.dispatchMessage(`avatar-overlay-element-size-changed`,{mascot:e.mascot,tray:e.tray})";
-+const NATIVE_PAGE_SIZE_MESSAGE_POLICY_26_609 =
-+  "l.dispatchMessage(`avatar-overlay-element-size-changed`,{isTrayVisible:e.tray!=null,mascot:e.mascot,tray:e.tray})";
-+const NOTIFICATION_PRIORITY_ANCHOR =
-+  "function D(e){switch(e){case`waiting`:return 0;case`failed`:return 1;case`review`:return 2;case`running`:return 3;case`idle`:return 4}}";
-+const TRANSIENT_HOVER_PRIORITY_ANCHOR = "x=g??(y?`jumping`:v)";
-+const TRANSIENT_DRAG_PRIORITY_ANCHOR = "function kt({currentDragState:e,deltaX:t}){return t>=at?`running-right`:t<=-at?`running-left`:e}";
-+const TRANSIENT_DRAG_PRIORITY_ANCHOR_26_609 = "function Yt({currentDragState:e,deltaX:t}){return t>=wt?`running-right`:t<=-wt?`running-left`:e}";
-+const TRANSIENT_STATE_PROP_ANCHOR = "state:k.mascotState,style:s,transientState:c";
-+const TRANSIENT_STATE_PROP_ANCHOR_26_609 = "state:N.mascotState,style:u,transientState:d";
-+const APP_ROOT_BACKGROUND_CSS_ANCHOR =
-+  "html,body{background:var(--color-background-surface);min-height:100%}#root{height:100vh;background:var(--color-background-surface)}";
-+const AVATAR_OVERLAY_CONTENT_FRAME_SELECTOR = '[data-avatar-overlay-content-frame="true"]';
-+const AVATAR_OVERLAY_TRANSPARENT_ROOT_CSS =
-+  `html:has(${AVATAR_OVERLAY_CONTENT_FRAME_SELECTOR}),html:has(${AVATAR_OVERLAY_CONTENT_FRAME_SELECTOR}) body,html:has(${AVATAR_OVERLAY_CONTENT_FRAME_SELECTOR}) #root{background:transparent!important}`;
 +const ASAR_BIN = process.env.ASAR_BIN ?? "asar";
 +const UNPACK_DIRS = "node_modules/{better-sqlite3,node-pty}";
 +
++const APP_READY_ANCHOR =
++  "let A=Date.now();await a.app.whenReady()";
++const LINUX_TRANSPARENT_VISUALS_POLICY =
++  "process.platform===`linux`&&a.app.commandLine.appendSwitch(`enable-transparent-visuals`);" +
++  APP_READY_ANCHOR;
++
++const POINTER_INTERACTIVITY_ANCHOR = "let t=!this.pointerInteractive;";
++const POINTER_INTERACTIVITY_POLICY = "let t=process.platform===`linux`?!1:!this.pointerInteractive;";
++
++const AVATAR_OVERLAY_WINDOW_OPTIONS_ANCHOR =
++  "case`avatarOverlay`:return{...a5({alwaysOnTop:!0,platform:n,resizable:!1,thickFrame:!1}),...n===`darwin`?{enableLargerThanScreen:!0}:{},hasShadow:!1}";
++const AVATAR_OVERLAY_WINDOW_OPTIONS_POLICY =
++  "case`avatarOverlay`:return{...a5({alwaysOnTop:!0,platform:n,resizable:!1,thickFrame:!1}),transparent:!0,backgroundColor:`#00000000`,...n===`darwin`?{enableLargerThanScreen:!0}:{},hasShadow:!1}";
++
++const TRANSPARENT_WINDOW_BACKDROP_ANCHOR =
++  "function r5({platform:e,appearance:t,opaqueWindowSurfaceEnabled:n,prefersDarkColors:r}){return n?{backgroundColor:r?E8:D8,backgroundMaterial:e===`win32`?`none`:null}:e===`win32`&&!Z8(t)?{backgroundColor:T8,backgroundMaterial:`mica`}:{backgroundColor:e===`linux`?(r?E8:D8):T8,backgroundMaterial:null}}";
++const TRANSPARENT_WINDOW_BACKDROP_POLICY =
++  "function r5({platform:e,appearance:t,opaqueWindowSurfaceEnabled:n,prefersDarkColors:r}){return Z8(t)?{backgroundColor:T8,backgroundMaterial:null}:n?{backgroundColor:r?E8:D8,backgroundMaterial:e===`win32`?`none`:null}:e===`win32`?{backgroundColor:T8,backgroundMaterial:`mica`}:{backgroundColor:e===`linux`?(r?E8:D8):T8,backgroundMaterial:null}}";
++
++const ELEMENT_SIZE_MESSAGE_ANCHOR =
++  "case`avatar-overlay-element-size-changed`:e.setElementSize(t.id,{...n.elementSizeRevision==null?{}:{elementSizeRevision:n.elementSizeRevision},isTrayVisible:n.isTrayVisible,mascot:n.mascot,tray:n.tray});return;";
++const ELEMENT_SIZE_MESSAGE_POLICY =
++  "case`avatar-overlay-element-size-changed`:e.setElementSize(t.id,{...n.elementSizeRevision==null?{}:{elementSizeRevision:n.elementSizeRevision},isTrayVisible:n.isTrayVisible,mascot:n.mascot,tray:n.tray,mascotShape:n.mascotShape??null});return;";
++
++const SET_ELEMENT_SIZE_ANCHOR =
++  "setElementSize(e,{elementSizeRevision:t,isTrayVisible:n,mascot:r,tray:i}){let a=this.window;if(!(a==null||a.isDestroyed()||a.webContents.id!==e)){if(this.cancelMomentum(),this.pendingElementSizeRevision=t??null,this.layoutMode=n==null?`native`:`legacy`,";
++const SET_ELEMENT_SIZE_POLICY =
++  "setElementSize(e,{elementSizeRevision:t,isTrayVisible:n,mascot:r,tray:i,mascotShape:o}){let a=this.window;if(!(a==null||a.isDestroyed()||a.webContents.id!==e)){if(this.cancelMomentum(),this.pendingElementSizeRevision=t??null,this.layoutMode=n==null?`native`:`legacy`,this.isTrayVisible=n,this.mascotShape=o??null,";
++
++const WINDOW_SHAPE_INIT_ANCHOR =
++  "this.resolutionKey=null,this.traySize=null,process.platform===`darwin`?";
++const WINDOW_SHAPE_INIT_POLICY =
++  "this.resolutionKey=null,this.isTrayVisible=!1,this.mascotShape=null,this.windowShapeSignature=null,this.traySize=null,process.platform===`darwin`?";
++
++const WINDOW_SHAPE_RESET_ANCHOR =
++  "this.pointerInteractive=!1,this.mousePassthroughEnabled=!1,this.compositionHost.setOverlayWindow(null),this.broadcastOpenState()";
++const WINDOW_SHAPE_RESET_POLICY =
++  "this.pointerInteractive=!1,this.mousePassthroughEnabled=!1,this.isTrayVisible=!1,this.mascotShape=null,this.windowShapeSignature=null,this.compositionHost.setOverlayWindow(null),this.broadcastOpenState()";
++
++const WINDOW_SHAPE_METHOD_ANCHOR =
++  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(m4(i,t)){this.nativePositionController.position(e,t);return}let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n&&!this.nativeCompositionSupported),this.nativePositionController.position(e,t),(r||!a)&&this.compositionHost.moveBackingCanvases()}sendLayoutToRenderer(e,t=null){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,...t==null?{}:{elementSizeRevision:t},layout:n4(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
++const WINDOW_SHAPE_METHOD_POLICY =
++  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(m4(i,t)){this.nativePositionController.position(e,t);return}let a=i.width===t.width&&i.height===t.height;a&&!r&&this.compositionHost.prepareDragFollowForOverlayMove(t),e.setContentBounds(t,n&&!this.nativeCompositionSupported),this.nativePositionController.position(e,t),(r||!a)&&this.compositionHost.moveBackingCanvases()}syncWindowShape(e){if(process.platform!==`linux`||e.isDestroyed()||this.layout==null)return;let t=this.mascotShape?.length?this.mascotShape.map(e=>({x:this.layout.mascot.left+e.x,y:this.layout.mascot.top+e.y,width:e.width,height:e.height})):[{x:this.layout.mascot.left,y:this.layout.mascot.top,width:this.layout.mascot.width,height:this.layout.mascot.height}],n=this.isTrayVisible&&this.layout.tray!=null?[...t,{x:this.layout.tray.left,y:this.layout.tray.top,width:this.layout.tray.width,height:this.layout.tray.height}]:t,r=JSON.stringify(n);this.windowShapeSignature===r||(this.windowShapeSignature=r,e.setShape(n))}sendLayoutToRenderer(e,t=null){e.isDestroyed()||this.layout==null||!this.rendererReady||this.windowManager.sendMessageToWebContents(e.webContents,{type:`avatar-overlay-layout-changed`,...t==null?{}:{elementSizeRevision:t},layout:n4(this.layout),nativeMaterialAttached:this.compositionHost.isNativeMaterialAttached()})}";
++
++const WINDOW_SHAPE_SYNC_ANCHOR =
++  "this.setWindowBounds(e,o.windowBounds,n,r),this.sendLayoutToRenderer(e,i)";
++const WINDOW_SHAPE_SYNC_POLICY =
++  "this.setWindowBounds(e,o.windowBounds,n,r),this.syncWindowShape(e),this.sendLayoutToRenderer(e,i)";
++
++const NATIVE_FRAME_FALLBACK_ANCHOR =
++  "function Y(e,t){return m(t,`forced-colors:bg-[Canvas]`,e?`bg-transparent`:`bg-token-main-surface-primary shadow-lg`)}";
++const NATIVE_FRAME_FALLBACK_POLICY =
++  "function Y(e,t){return m(t,`forced-colors:bg-[Canvas]`,process.platform===`linux`||e?`bg-transparent`:`bg-token-main-surface-primary shadow-lg`)}";
++
++const NATIVE_PAGE_SHAPE_HELPER_ANCHOR =
++  "var Je=n(),Ye=15e3,Xe=208,Ze=[],Qe=`first-awake-pet-notification-avatar-ids`";
++const NATIVE_PAGE_SHAPE_HELPER_POLICY =
++  "var __codexAvatarLinuxShapeCache=new Map,__codexAvatarLinuxShapeLoading=new Set;function __codexAvatarLinuxMascotShape(){if(process.platform!==`linux`)return null;let e=document.querySelector(`[data-avatar-overlay-hit-region=\"mascot\"] .codex-avatar-root`)??document.querySelector(`.codex-avatar-root`);if(e==null)return null;let t=getComputedStyle(e),n=(t.backgroundImage||``).match(/^url\\([\"']?(.*?)[\"']?\\)$/);if(n==null)return null;let r=n[1],i=e.getBoundingClientRect(),a=Math.ceil(i.width),o=Math.ceil(i.height);if(a<=0||o<=0)return null;let s=e.getAttribute(`data-avatar-state`)??`idle`,c={failed:[5,8],idle:[0,6],jumping:[4,5],review:[8,6],running:[7,6],\"running-left\":[2,8],\"running-right\":[1,8],waving:[3,4],waiting:[6,6]}[s]??[0,6],l=`${r}|${a}x${o}|${s}`,u=__codexAvatarLinuxShapeCache.get(l);if(u!=null)return u;if(!__codexAvatarLinuxShapeLoading.has(l)){__codexAvatarLinuxShapeLoading.add(l);let e=new Image;e.onload=()=>{try{let t=document.createElement(`canvas`);t.width=e.naturalWidth,t.height=e.naturalHeight;let n=t.getContext(`2d`,{willReadFrequently:!0});if(n==null)return;n.drawImage(e,0,0);let i=n.getImageData(0,0,t.width,t.height).data,s=Math.floor(t.width/8),u=Math.floor(t.height/9);if(s<=0||u<=0)return;let d=Math.max(0,Math.min(8,c[0])),f=Math.max(1,Math.min(8,c[1])),p=Array(u).fill(1/0),m=Array(u).fill(-1);for(let e=0;e<f;e++){let n=e*s,h=((d*u)*t.width+n)*4;for(let e=0;e<u;e++){let t=h+e*t.width*4;for(let n=0;n<s;n++)i[t+n*4+3]>16&&(n<p[e]&&(p[e]=n),n>m[e]&&(m[e]=n))}}let g=[];for(let e=0;e<u;e++)if(m[e]>=p[e]){let t=Math.max(0,Math.floor(p[e]*a/s)-1),n=Math.min(a,Math.ceil((m[e]+1)*a/s)+1),r=Math.floor(e*o/u),i=Math.max(1,Math.ceil((e+1)*o/u)-r),c=g[g.length-1];c&&c.x===t&&c.width===n-t&&c.y+c.height===r?c.height+=i:g.push({x:t,y:r,width:n-t,height:i})}__codexAvatarLinuxShapeCache.set(l,g),window.dispatchEvent(new Event(`codex-avatar-linux-shape-ready`))}catch{}finally{__codexAvatarLinuxShapeLoading.delete(l)}};e.onerror=()=>__codexAvatarLinuxShapeLoading.delete(l);e.src=r}return null}" +
++  NATIVE_PAGE_SHAPE_HELPER_ANCHOR;
++
++const NATIVE_PAGE_SIZE_MESSAGE_ANCHOR =
++  "p.dispatchMessage(`avatar-overlay-element-size-changed`,{...n==null?{}:{elementSizeRevision:n},mascot:e.mascot,tray:e.tray})";
++const NATIVE_PAGE_SIZE_MESSAGE_POLICY =
++  "p.dispatchMessage(`avatar-overlay-element-size-changed`,{...n==null?{}:{elementSizeRevision:n},isTrayVisible:e.tray!=null,mascot:e.mascot,tray:e.tray,mascotShape:__codexAvatarLinuxMascotShape()})";
++
++const NATIVE_PAGE_SHAPE_READY_ANCHOR = "let X=en,tn;";
++const NATIVE_PAGE_SHAPE_READY_POLICY =
++  "let X=en,tn;(0,w.useEffect)(()=>{if(process.platform!==`linux`)return;let e=()=>{Vt.current=null,X()},t=new MutationObserver(e);return window.addEventListener(`codex-avatar-linux-shape-ready`,e),document.body&&t.observe(document.body,{subtree:!0,childList:!0,attributes:!0,attributeFilter:[`data-avatar-state`]}),()=>{window.removeEventListener(`codex-avatar-linux-shape-ready`,e),t.disconnect()}},[X]);";
++
++const TEMPORARY_STATE_ANIMATION_ANCHOR =
++  "let r=[...n,...n,...n];return{frames:[...r,...x],loopStartIndex:r.length}";
++const PERSISTENT_STATE_ANIMATION_POLICY = "return{frames:n,loopStartIndex:0}";
++
 +/**
-+ * 2026-06-10 苍朮
-+ * Purpose: count exact substring occurrences without regular-expression escaping risk.
-+ * @param {string} text - Source text to inspect.
++ * 2026-06-18 苍朮
++ * Purpose: count exact minified bundle anchors without regular-expression escaping risk.
++ * @param {string} source - Source text to inspect.
 + * @param {string} needle - Exact substring to count.
-+ * @returns {number} Number of exact substring occurrences in the source text.
++ * @returns {number} Number of exact substring occurrences.
 + */
-+function countOccurrences(text, needle) {
-+  return text.split(needle).length - 1;
++function countOccurrences(source, needle) {
++  return source.split(needle).length - 1;
 +}
 +
 +/**
-+ * 2026-06-10 苍朮
-+ * Purpose: assert that a minified bundle still exposes every anchor required by the Linux avatar overlay patch.
-+ * @param {string} source - JavaScript bundle source to inspect.
-+ * @param {string[]} anchors - Exact substrings that must be present.
-+ * @param {string} description - Human-readable bundle or behavior name for error reporting.
-+ * @returns {void}
++ * 2026-06-18 苍朮
++ * Purpose: replace one current-upstream minified anchor and treat an already patched bundle as valid.
++ * @param {string} source - Source text to patch.
++ * @param {string} oldAnchor - Exact upstream substring.
++ * @param {string} newPolicy - Exact patched substring.
++ * @param {string} description - Human-readable patch point for diagnostics.
++ * @returns {{source: string, changed: boolean}} Patched source and whether it changed.
 + */
-+function assertAnchorsPresent(source, anchors, description) {
-+  const missing = anchors.filter((anchor) => !source.includes(anchor));
-+  if (missing.length > 0) {
-+    throw new Error(`Missing ${description} anchor(s): ${missing.join(", ")}`);
-+  }
-+}
-+
-+/**
-+ * 2026-06-16 苍朮
-+ * Purpose: assert that each semantic anchor group is represented by at least one accepted minified release variant.
-+ * @param {string} source - Combined JavaScript bundle source to inspect.
-+ * @param {{description: string, anchors: string[]}[]} groups - Semantic anchor groups with accepted release variants.
-+ * @param {string} description - Human-readable behavior name for error reporting.
-+ * @returns {void}
-+ */
-+function assertAnchorGroupsPresent(source, groups, description) {
-+  const missing = groups.filter((group) => !group.anchors.some((anchor) => source.includes(anchor))).map((group) => group.description);
-+  if (missing.length > 0) {
-+    throw new Error(`Missing ${description} anchor group(s): ${missing.join(", ")}`);
-+  }
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: replace a one-shot minified policy while treating an already-patched bundle as valid.
-+ * @param {string} source - JavaScript bundle source to patch.
-+ * @param {string} oldAnchor - Exact upstream minified code to replace.
-+ * @param {string} newPolicy - Exact patched minified code expected after replacement.
-+ * @param {string} description - Human-readable policy name for diagnostics.
-+ * @returns {{source: string, changed: boolean, oldCount: number, newCount: number}} Patched source and post-patch old/new counts.
-+ */
-+function replaceExactPolicy(source, oldAnchor, newPolicy, description) {
++function replaceExact(source, oldAnchor, newPolicy, description) {
 +  const oldCount = countOccurrences(source, oldAnchor);
 +  const newCount = countOccurrences(source, newPolicy);
-+  let changed = false;
++
++  if (newCount === 1 && countOccurrences(source.replace(newPolicy, ""), oldAnchor) === 0) {
++    return { source, changed: false };
++  }
 +
 +  if (oldCount === 1 && newCount === 0) {
-+    source = source.replace(oldAnchor, newPolicy);
-+    changed = true;
-+  } else if (oldCount !== 0 || newCount !== 1) {
-+    throw new Error(`Expected old=1/new=0 or old=0/new=1 for ${description}, found old=${oldCount}, new=${newCount}`);
++    return { source: source.replace(oldAnchor, newPolicy), changed: true };
 +  }
 +
-+  return {
-+    source,
-+    changed,
-+    oldCount: countOccurrences(source, oldAnchor),
-+    newCount: countOccurrences(source, newPolicy),
-+  };
++  throw new Error(`Expected old=1/new=0 or old=0/new=1 for ${description}, found old=${oldCount}, new=${newCount}`);
 +}
 +
 +/**
-+ * 2026-06-11 苍朮
-+ * Purpose: replace a minified policy from either upstream code or a previous broken patch revision.
-+ * @param {string} source - JavaScript bundle source to patch.
-+ * @param {string[]} oldAnchors - Exact upstream or legacy patched snippets accepted as replaceable inputs.
-+ * @param {string} newPolicy - Exact patched minified code expected after replacement.
-+ * @param {string} description - Human-readable policy name for diagnostics.
-+ * @returns {{source: string, changed: boolean, oldCount: number, newCount: number}} Patched source and post-patch old/new counts.
++ * 2026-06-18 苍朮
++ * Purpose: locate one file by basename inside an extracted asar tree.
++ * @param {string} root - Directory to scan.
++ * @param {string} targetBasename - File basename to find.
++ * @returns {Promise<string>} Absolute path of the matching file.
 + */
-+function replaceExactPolicyFromAny(source, oldAnchors, newPolicy, description) {
-+  const oldCounts = oldAnchors.map((anchor) => countOccurrences(source, anchor));
-+  const totalOldCount = oldCounts.reduce((sum, count) => sum + count, 0);
-+  const newCount = countOccurrences(source, newPolicy);
-+
-+  if (totalOldCount === 1 && newCount === 0) {
-+    const anchorIndex = oldCounts.findIndex((count) => count === 1);
-+    source = source.replace(oldAnchors[anchorIndex], newPolicy);
-+    return {
-+      source,
-+      changed: true,
-+      oldCount: oldAnchors.reduce((sum, anchor) => sum + countOccurrences(source, anchor), 0),
-+      newCount: countOccurrences(source, newPolicy),
-+    };
-+  }
-+
-+  if (totalOldCount !== 0 || newCount !== 1) {
-+    throw new Error(`Expected old=1/new=0 or old=0/new=1 for ${description}, found old=${totalOldCount}, new=${newCount}`);
-+  }
-+
-+  return {
-+    source,
-+    changed: false,
-+    oldCount: totalOldCount,
-+    newCount,
-+  };
-+}
-+
-+/**
-+ * 2026-06-16 苍朮
-+ * Purpose: replace one accepted minified policy pair while preserving each Codex release's local variable names.
-+ * @param {string} source - JavaScript bundle source to patch.
-+ * @param {[string, string][]} policyPairs - Exact upstream or legacy snippets paired with their matching patched snippets.
-+ * @param {string} description - Human-readable policy name for diagnostics.
-+ * @returns {{source: string, changed: boolean, oldCount: number, newCount: number}} Patched source and post-patch old/new counts.
-+ */
-+function replaceExactPolicyPairFromAny(source, policyPairs, description) {
-+  const oldCounts = policyPairs.map(([oldAnchor]) => countOccurrences(source, oldAnchor));
-+  const newCounts = policyPairs.map(([, newPolicy]) => countOccurrences(source, newPolicy));
-+  const totalOldCount = oldCounts.reduce((sum, count) => sum + count, 0);
-+  const totalNewCount = newCounts.reduce((sum, count) => sum + count, 0);
-+
-+  if (totalOldCount === 1 && totalNewCount === 0) {
-+    const pairIndex = oldCounts.findIndex((count) => count === 1);
-+    source = source.replace(policyPairs[pairIndex][0], policyPairs[pairIndex][1]);
-+    return {
-+      source,
-+      changed: true,
-+      oldCount: policyPairs.reduce((sum, [oldAnchor]) => sum + countOccurrences(source, oldAnchor), 0),
-+      newCount: policyPairs.reduce((sum, [, newPolicy]) => sum + countOccurrences(source, newPolicy), 0),
-+    };
-+  }
-+
-+  if (totalOldCount !== 0 || totalNewCount !== 1) {
-+    throw new Error(`Expected old=1/new=0 or old=0/new=1 for ${description}, found old=${totalOldCount}, new=${totalNewCount}`);
-+  }
-+
-+  return {
-+    source,
-+    changed: false,
-+    oldCount: totalOldCount,
-+    newCount: totalNewCount,
-+  };
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: count app.whenReady anchors that still lack the Linux transparent-visuals switch immediately before them.
-+ * @param {string} source - Electron main-process bundle source to inspect.
-+ * @returns {number} Number of app.whenReady startup anchors not yet protected by the transparent-visuals switch.
-+ */
-+function countUnpatchedTransparentVisualsAnchors(source) {
-+  return countOccurrences(source, APP_READY_ANCHOR) - countOccurrences(source, LINUX_TRANSPARENT_VISUALS_POLICY);
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: recursively list files below a directory so hashed bundle names can change across Codex releases.
-+ * @param {string} root - Directory to scan recursively.
-+ * @returns {Promise<string[]>} Absolute file paths contained in the directory tree.
-+ */
-+async function listFiles(root) {
++async function findByBasename(root, targetBasename) {
 +  const entries = await readdir(root, { withFileTypes: true });
-+  const files = await Promise.all(
-+    entries.map((entry) => {
-+      const filePath = join(root, entry.name);
-+      return entry.isDirectory() ? listFiles(filePath) : [filePath];
-+    }),
-+  );
-+  return files.flat();
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: find the Electron main-process bundle that owns the avatar pointer-interactivity anchor.
-+ * @param {string} buildRoot - Extracted .vite/build directory to scan.
-+ * @returns {Promise<string>} Absolute path to the only matching main bundle.
-+ */
-+async function findAvatarOverlayBundle(buildRoot) {
-+  const candidates = (await listFiles(buildRoot)).filter((filePath) => /^main-[A-Za-z0-9_-]+\.js$/.test(basename(filePath)));
-+  const matches = candidates.filter((filePath) => {
-+    const source = readFileSync(filePath, "utf8");
-+    return source.includes(POINTER_INTERACTIVITY_ANCHOR) || source.includes(LINUX_POINTER_INTERACTIVITY_POLICY);
-+  });
-+
-+  if (matches.length !== 1) {
-+    throw new Error(`Expected exactly one avatar overlay main bundle, found ${matches.length}: ${matches.join(", ")}`);
++  for (const entry of entries) {
++    const path = join(root, entry.name);
++    if (entry.isDirectory()) {
++      const found = await findByBasename(path, targetBasename).catch(() => null);
++      if (found != null) return found;
++    } else if (entry.isFile() && basename(path) === targetBasename) {
++      return path;
++    }
 +  }
 +
-+  return matches[0];
++  throw new Error(`Unable to find ${targetBasename} under ${root}`);
 +}
 +
 +/**
-+ * 2026-06-10 苍朮
-+ * Purpose: find the webview avatar spritesheet bundle that owns the non-idle animation fallback.
-+ * @param {string} assetsRoot - Extracted webview/assets directory to scan.
-+ * @returns {Promise<string>} Absolute path to the only matching codex-avatar bundle.
++ * 2026-06-18 苍朮
++ * Purpose: apply a list of exact replacements to a text file.
++ * @param {string} filePath - File to read and rewrite.
++ * @param {{oldAnchor: string, newPolicy: string, description: string}[]} replacements - Exact replacement policies.
++ * @returns {{filePath: string, changed: boolean, sha256: string}} Patch summary for diagnostics.
 + */
-+async function findCodexAvatarBundle(assetsRoot) {
-+  const candidates = (await listFiles(assetsRoot)).filter((filePath) => /^codex-avatar-[A-Za-z0-9_-]+\.js$/.test(basename(filePath)));
-+  const matches = candidates.filter((filePath) => {
-+    const source = readFileSync(filePath, "utf8");
-+    return source.includes(TEMPORARY_STATE_ANIMATION_ANCHOR) || source.includes(PERSISTENT_STATE_ANIMATION_POLICY);
-+  });
-+
-+  if (matches.length !== 1) {
-+    throw new Error(`Expected exactly one codex-avatar bundle, found ${matches.length}: ${matches.join(", ")}`);
-+  }
-+
-+  return matches[0];
-+}
-+
-+/**
-+ * 2026-06-11 苍朮
-+ * Purpose: find the native avatar overlay renderer bundle that reports measured mascot and tray geometry.
-+ * @param {string} assetsRoot - Extracted webview/assets directory to scan.
-+ * @returns {Promise<string>} Absolute path to the only matching native avatar overlay page bundle.
-+ */
-+async function findAvatarOverlayNativePageBundle(assetsRoot) {
-+  const candidates = (await listFiles(assetsRoot)).filter((filePath) =>
-+    /^avatar-overlay-native-page-[A-Za-z0-9_-]+\.js$/.test(basename(filePath)),
-+  );
-+  const matches = candidates.filter((filePath) => {
-+    const source = readFileSync(filePath, "utf8");
-+    return (
-+      source.includes(NATIVE_PAGE_SIZE_MESSAGE_ANCHOR) ||
-+      source.includes(NATIVE_PAGE_SIZE_MESSAGE_POLICY) ||
-+      source.includes(NATIVE_PAGE_SIZE_MESSAGE_ANCHOR_26_609) ||
-+      source.includes(NATIVE_PAGE_SIZE_MESSAGE_POLICY_26_609)
-+    );
-+  });
-+
-+  if (matches.length !== 1) {
-+    throw new Error(`Expected exactly one native avatar overlay page bundle, found ${matches.length}: ${matches.join(", ")}`);
-+  }
-+
-+  return matches[0];
-+}
-+
-+/**
-+ * 2026-06-11 苍朮
-+ * Purpose: find the shared app CSS bundle that paints the Electron root background behind the avatar overlay.
-+ * @param {string} assetsRoot - Extracted webview/assets directory to scan.
-+ * @returns {Promise<string>} Absolute path to the only matching shared app CSS bundle.
-+ */
-+async function findAppRootCssBundle(assetsRoot) {
-+  const candidates = (await listFiles(assetsRoot)).filter((filePath) => /^app(?:--)?-[A-Za-z0-9_-]+\.css$/.test(basename(filePath)));
-+  const matches = candidates.filter((filePath) => {
-+    const source = readFileSync(filePath, "utf8");
-+    return (
-+      source.includes(APP_ROOT_BACKGROUND_CSS_ANCHOR) &&
-+      (source.includes(AVATAR_OVERLAY_CONTENT_FRAME_SELECTOR) || source.includes(".bg-transparent{background-color:#0000}"))
-+    );
-+  });
-+
-+  if (matches.length !== 1) {
-+    throw new Error(`Expected exactly one app root CSS bundle, found ${matches.length}: ${matches.join(", ")}`);
-+  }
-+
-+  return matches[0];
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: verify the avatar notification priority and transient animation precedence anchors across webview bundles.
-+ * @param {string} assetsRoot - Extracted webview/assets directory to scan.
-+ * @returns {Promise<void>} Resolves when all priority-related anchors are present.
-+ */
-+async function validateAvatarPriorityAnchors(assetsRoot) {
-+  const sources = (await listFiles(assetsRoot))
-+    .filter((filePath) => filePath.endsWith(".js"))
-+    .map((filePath) => readFileSync(filePath, "utf8"))
-+    .join("\n");
-+  assertAnchorGroupsPresent(
-+    sources,
-+    [
-+      { description: "notification priority", anchors: [NOTIFICATION_PRIORITY_ANCHOR] },
-+      { description: "hover transient priority", anchors: [TRANSIENT_HOVER_PRIORITY_ANCHOR] },
-+      { description: "drag transient priority", anchors: [TRANSIENT_DRAG_PRIORITY_ANCHOR, TRANSIENT_DRAG_PRIORITY_ANCHOR_26_609] },
-+      { description: "transient state prop", anchors: [TRANSIENT_STATE_PROP_ANCHOR, TRANSIENT_STATE_PROP_ANCHOR_26_609] },
-+    ],
-+    "avatar notification priority and transient animation precedence",
-+  );
-+}
-+
-+/**
-+ * 2026-06-11 苍朮
-+ * Purpose: patch the Linux avatar overlay window-tray visibility store into the main bundle.
-+ * @param {string} source - Electron main-process bundle source to patch.
-+ * @returns {{source: string, changed: boolean, oldCount: number, newCount: number}} Patched source and post-patch store counts.
-+ */
-+function patchTrayVisibilityStore(source) {
-+  return replaceExactPolicy(source, TRAY_VISIBILITY_STORE_ANCHOR, TRAY_VISIBILITY_STORE_POLICY, "avatar tray visibility store");
-+}
-+
-+/**
-+ * 2026-06-11 苍朮
-+ * Purpose: insert the Linux-only BrowserWindow shape synchronization hook into the main bundle.
-+ * @param {string} source - Electron main-process bundle source to patch.
-+ * @returns {{source: string, changed: boolean, oldCount: number, newCount: number}} Patched source and post-patch shape hook counts.
-+ */
-+function patchWindowShapeSync(source) {
-+  const shapeCallResult = replaceExactPolicy(source, WINDOW_SHAPE_SYNC_ANCHOR, WINDOW_SHAPE_SYNC_POLICY, "avatar Linux window shape sync call");
-+  source = shapeCallResult.source;
-+
-+  const methodResult = replaceExactPolicyPairFromAny(
-+    source,
-+    [
-+      [WINDOW_SHAPE_METHOD_ANCHOR, WINDOW_SHAPE_METHOD_POLICY],
-+      [WINDOW_SHAPE_METHOD_LEGACY_POLICY, WINDOW_SHAPE_METHOD_POLICY],
-+      [WINDOW_SHAPE_METHOD_ANCHOR_26_609, WINDOW_SHAPE_METHOD_POLICY_26_609],
-+    ],
-+    "avatar Linux window shape sync method",
-+  );
-+  source = methodResult.source;
-+
-+  const initResult = replaceExactPolicy(source, WINDOW_SHAPE_INIT_ANCHOR, WINDOW_SHAPE_INIT_POLICY, "avatar Linux window shape initialization");
-+  source = initResult.source;
-+
-+  const resetResult = replaceExactPolicy(source, WINDOW_SHAPE_RESET_ANCHOR, WINDOW_SHAPE_RESET_POLICY, "avatar Linux window shape reset");
-+
-+  return {
-+    source: resetResult.source,
-+    changed: shapeCallResult.changed || methodResult.changed || initResult.changed || resetResult.changed,
-+    oldCount: countOccurrences(resetResult.source, WINDOW_SHAPE_SYNC_ANCHOR),
-+    newCount: countOccurrences(resetResult.source, WINDOW_SHAPE_SYNC_POLICY),
-+  };
-+}
-+
-+/**
-+ * 2026-06-11 苍朮
-+ * Purpose: send explicit tray visibility from the native avatar overlay renderer so Linux shape follows visible prompt bubbles.
-+ * @param {string} bundlePath - Absolute path to the webview native avatar overlay page JavaScript bundle.
-+ * @returns {{bundlePath: string, hash: string, changed: boolean, oldCount: number, newCount: number}} Patched bundle path, SHA256 hash, whether content changed, and post-patch message counts.
-+ */
-+function patchAvatarOverlayNativePageBundle(bundlePath) {
-+  const source = readFileSync(bundlePath, "utf8");
-+  const result = replaceExactPolicyPairFromAny(
-+    source,
-+    [
-+      [NATIVE_PAGE_SIZE_MESSAGE_ANCHOR, NATIVE_PAGE_SIZE_MESSAGE_POLICY],
-+      [NATIVE_PAGE_SIZE_MESSAGE_ANCHOR_26_609, NATIVE_PAGE_SIZE_MESSAGE_POLICY_26_609],
-+    ],
-+    "native avatar overlay tray visibility message",
-+  );
-+
-+  writeFileSync(bundlePath, result.source);
-+  return {
-+    bundlePath,
-+    changed: result.changed,
-+    hash: createHash("sha256").update(result.source).digest("hex"),
-+    oldCount: result.oldCount,
-+    newCount: result.newCount,
-+  };
-+}
-+
-+/**
-+ * 2026-06-11 苍朮
-+ * Purpose: make the avatar overlay page root transparent so Linux window alpha reaches the desktop instead of the themed app background.
-+ * @param {string} bundlePath - Absolute path to the shared app CSS bundle.
-+ * @returns {{bundlePath: string, hash: string, changed: boolean, rootBackgroundAnchorCount: number, transparentRootPolicyCount: number}} Patched CSS path, SHA256 hash, whether content changed, and post-patch root-background counts.
-+ */
-+function patchAvatarOverlayRootTransparencyCss(bundlePath) {
-+  let source = readFileSync(bundlePath, "utf8");
-+  const rootBackgroundAnchorCount = countOccurrences(source, APP_ROOT_BACKGROUND_CSS_ANCHOR);
-+  let transparentRootPolicyCount = countOccurrences(source, AVATAR_OVERLAY_TRANSPARENT_ROOT_CSS);
++function patchTextFile(filePath, replacements) {
++  let source = readFileSync(filePath, "utf8");
 +  let changed = false;
 +
-+  if (rootBackgroundAnchorCount !== 1) {
-+    throw new Error(`Expected one app root background CSS anchor, found ${rootBackgroundAnchorCount}`);
++  for (const replacement of replacements) {
++    const result = replaceExact(source, replacement.oldAnchor, replacement.newPolicy, replacement.description);
++    source = result.source;
++    changed ||= result.changed;
 +  }
 +
-+  if (transparentRootPolicyCount === 0) {
-+    source = `${source}\n${AVATAR_OVERLAY_TRANSPARENT_ROOT_CSS}`;
-+    transparentRootPolicyCount = countOccurrences(source, AVATAR_OVERLAY_TRANSPARENT_ROOT_CSS);
-+    changed = true;
-+  } else if (transparentRootPolicyCount !== 1) {
-+    throw new Error(`Expected zero or one avatar overlay transparent root CSS policy, found ${transparentRootPolicyCount}`);
++  if (changed) {
++    writeFileSync(filePath, source);
 +  }
 +
-+  writeFileSync(bundlePath, source);
 +  return {
-+    bundlePath,
++    filePath,
 +    changed,
-+    hash: createHash("sha256").update(source).digest("hex"),
-+    rootBackgroundAnchorCount,
-+    transparentRootPolicyCount,
++    sha256: createHash("sha256").update(source).digest("hex"),
 +  };
 +}
 +
 +/**
-+ * 2026-06-10 苍朮
-+ * Purpose: replace the avatar overlay passthrough, Linux transparent-window startup policies, and Linux window-shape sync.
-+ * @param {string} bundlePath - Absolute path to the Electron main-process JavaScript bundle.
-+ * @returns {{bundlePath: string, hash: string, changed: boolean, pointerOldCount: number, pointerNewCount: number, transparentOldCount: number, transparentNewCount: number, trayVisibilityOldCount: number, trayVisibilityNewCount: number, windowShapeOldCount: number, windowShapeNewCount: number}} Patched bundle path, SHA256 hash, whether content changed, and post-patch policy counts.
++ * 2026-06-18 苍朮
++ * Purpose: patch Codex's current Linux avatar overlay bundles inside app.asar.
++ * @param {string} asarPath - Path to resources/app.asar from the extracted Codex app.
++ * @returns {Promise<void>} Resolves after app.asar is rewritten, or throws on missing anchors.
 + */
-+function patchAvatarOverlayBundle(bundlePath) {
-+  let source = readFileSync(bundlePath, "utf8");
-+  const pointerResult = replaceExactPolicy(source, POINTER_INTERACTIVITY_ANCHOR, LINUX_POINTER_INTERACTIVITY_POLICY, "avatar pointer policy");
-+  source = pointerResult.source;
-+
-+  const transparentOldCount = countUnpatchedTransparentVisualsAnchors(source);
-+  const transparentNewCount = countOccurrences(source, LINUX_TRANSPARENT_VISUALS_POLICY);
-+  let transparentChanged = false;
-+
-+  if (transparentOldCount === 1 && transparentNewCount === 0) {
-+    source = source.replace(APP_READY_ANCHOR, LINUX_TRANSPARENT_VISUALS_POLICY);
-+    transparentChanged = true;
-+  } else if (transparentOldCount !== 0 || transparentNewCount !== 1) {
-+    throw new Error(
-+      `Expected old=1/new=0 or old=0/new=1 for Linux transparent visuals, found old=${transparentOldCount}, new=${transparentNewCount}`,
-+    );
++async function patchAvatarOverlay(asarPath) {
++  if (!existsSync(asarPath)) {
++    throw new Error(`Missing app.asar: ${asarPath}`);
 +  }
 +
-+  const trayVisibilityResult = patchTrayVisibilityStore(source);
-+  source = trayVisibilityResult.source;
-+
-+  const windowShapeResult = patchWindowShapeSync(source);
-+  source = windowShapeResult.source;
-+
-+  assertAnchorsPresent(source, DYNAMIC_LAYOUT_ANCHORS, "avatar dynamic layout");
-+
-+  writeFileSync(bundlePath, source);
-+  return {
-+    bundlePath,
-+    changed: pointerResult.changed || transparentChanged || trayVisibilityResult.changed || windowShapeResult.changed,
-+    hash: createHash("sha256").update(source).digest("hex"),
-+    pointerOldCount: countOccurrences(source, POINTER_INTERACTIVITY_ANCHOR),
-+    pointerNewCount: countOccurrences(source, LINUX_POINTER_INTERACTIVITY_POLICY),
-+    transparentOldCount: countUnpatchedTransparentVisualsAnchors(source),
-+    transparentNewCount: countOccurrences(source, LINUX_TRANSPARENT_VISUALS_POLICY),
-+    trayVisibilityOldCount: countOccurrences(source, TRAY_VISIBILITY_STORE_ANCHOR),
-+    trayVisibilityNewCount: countOccurrences(source, TRAY_VISIBILITY_STORE_POLICY),
-+    windowShapeOldCount: countOccurrences(source, WINDOW_SHAPE_SYNC_ANCHOR),
-+    windowShapeNewCount: countOccurrences(source, WINDOW_SHAPE_SYNC_POLICY),
-+  };
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: keep non-idle avatar animation frames looping while the owning session state remains active.
-+ * @param {string} bundlePath - Absolute path to the webview codex-avatar JavaScript bundle.
-+ * @returns {{bundlePath: string, hash: string, changed: boolean, oldCount: number, newCount: number}} Patched bundle path, SHA256 hash, whether content changed, and post-patch animation counts.
-+ */
-+function patchCodexAvatarBundle(bundlePath) {
-+  const source = readFileSync(bundlePath, "utf8");
-+  const result = replaceExactPolicy(
-+    source,
-+    TEMPORARY_STATE_ANIMATION_ANCHOR,
-+    PERSISTENT_STATE_ANIMATION_POLICY,
-+    "codex-avatar persistent state animation",
-+  );
-+
-+  writeFileSync(bundlePath, result.source);
-+  return {
-+    bundlePath,
-+    changed: result.changed,
-+    hash: createHash("sha256").update(result.source).digest("hex"),
-+    oldCount: result.oldCount,
-+    newCount: result.newCount,
-+  };
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: run the system asar CLI with inherited stdio so pack/extract failures surface directly.
-+ * @param {string} command - Asar subcommand to execute.
-+ * @param {string[]} args - Arguments passed to the asar CLI after the subcommand.
-+ * @returns {void}
-+ */
-+function runAsar(command, args) {
-+  execFileSync(ASAR_BIN, [command, ...args], { stdio: "inherit" });
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: replace the original archive with the patched archive after repacking.
-+ * @param {string} originalAsar - Path to the original app.asar archive.
-+ * @param {string} patchedAsar - Path to the newly packed app.asar archive.
-+ * @returns {void}
-+ */
-+function replacePackedArchive(originalAsar, patchedAsar) {
-+  renameSync(patchedAsar, originalAsar);
-+}
-+
-+/**
-+ * 2026-06-10 苍朮
-+ * Purpose: extract, patch, validate, and repack Codex's app.asar while preserving native module unpacking.
-+ * @param {string | undefined} appAsar - Path to the app.asar archive inside the extracted Linux bundle.
-+ * @returns {Promise<void>} Resolves after the archive has been replaced with the patched version.
-+ */
-+async function main(appAsar) {
-+  if (!appAsar || !existsSync(appAsar)) {
-+    throw new Error(`app.asar not found: ${appAsar ?? "<missing argument>"}`);
-+  }
-+
-+  const tempRoot = mkdtempSync(join(dirname(appAsar), ".codex-app-unofficial-avatar-asar-"));
-+  const extractedRoot = join(tempRoot, "app");
-+  const patchedAsar = join(tempRoot, "app.asar");
++  const tempRoot = mkdtempSync(join(dirname(asarPath), ".codex-avatar-overlay-"));
++  const extractDir = join(tempRoot, "app");
++  const packedAsar = join(tempRoot, "app.asar");
 +
 +  try {
-+    runAsar("extract", [appAsar, extractedRoot]);
-+    const buildRoot = join(extractedRoot, ".vite", "build");
-+    const assetsRoot = join(extractedRoot, "webview", "assets");
-+    const mainResult = patchAvatarOverlayBundle(await findAvatarOverlayBundle(buildRoot));
-+    const nativePageResult = patchAvatarOverlayNativePageBundle(await findAvatarOverlayNativePageBundle(assetsRoot));
-+    const rootCssResult = patchAvatarOverlayRootTransparencyCss(await findAppRootCssBundle(assetsRoot));
-+    const avatarResult = patchCodexAvatarBundle(await findCodexAvatarBundle(assetsRoot));
-+    await validateAvatarPriorityAnchors(assetsRoot);
++    execFileSync(ASAR_BIN, ["extract", asarPath, extractDir], { stdio: "inherit" });
 +
-+    runAsar("pack", [extractedRoot, patchedAsar, "--unpack-dir", UNPACK_DIRS]);
-+    replacePackedArchive(appAsar, patchedAsar);
++    const mainBundle = join(extractDir, ".vite/build/main-DLo8G5hp.js");
++    const nativePageBundle = await findByBasename(extractDir, "avatar-overlay-native-page-Ct6lOFWD.js");
++    const nativeFrameBundle = await findByBasename(extractDir, "avatar-overlay-native-frame-Bb-BcOSq.js");
++    const codexAvatarBundle = await findByBasename(extractDir, "codex-avatar-BYRhu0mv.js");
 +
-+    console.log(`${mainResult.changed ? "Patched" : "Already patched"} ${mainResult.bundlePath}`);
-+    console.log(`Avatar pointer policy old=${mainResult.pointerOldCount}/new=${mainResult.pointerNewCount}`);
-+    console.log(`Transparent visuals old=${mainResult.transparentOldCount}/new=${mainResult.transparentNewCount}`);
-+    console.log(`Avatar tray visibility store old=${mainResult.trayVisibilityOldCount}/new=${mainResult.trayVisibilityNewCount}`);
-+    console.log(`Avatar Linux window shape old=${mainResult.windowShapeOldCount}/new=${mainResult.windowShapeNewCount}`);
-+    console.log(`Avatar overlay bundle sha256=${mainResult.hash}`);
-+    console.log(`${nativePageResult.changed ? "Patched" : "Already patched"} ${nativePageResult.bundlePath}`);
-+    console.log(`Native avatar tray visibility message old=${nativePageResult.oldCount}/new=${nativePageResult.newCount}`);
-+    console.log(`Native avatar overlay page bundle sha256=${nativePageResult.hash}`);
-+    console.log(`${rootCssResult.changed ? "Patched" : "Already patched"} ${rootCssResult.bundlePath}`);
-+    console.log(
-+      `Avatar overlay transparent root CSS root-anchor=${rootCssResult.rootBackgroundAnchorCount}/policy=${rootCssResult.transparentRootPolicyCount}`,
-+    );
-+    console.log(`Avatar overlay transparent root CSS bundle sha256=${rootCssResult.hash}`);
-+    console.log(`${avatarResult.changed ? "Patched" : "Already patched"} ${avatarResult.bundlePath}`);
-+    console.log(`Codex avatar persistent animation old=${avatarResult.oldCount}/new=${avatarResult.newCount}`);
-+    console.log(`Codex avatar bundle sha256=${avatarResult.hash}`);
-+    console.log("Avatar dynamic layout and priority anchors verified");
++    const summaries = [
++      patchTextFile(mainBundle, [
++        {
++          oldAnchor: APP_READY_ANCHOR,
++          newPolicy: LINUX_TRANSPARENT_VISUALS_POLICY,
++          description: "Linux transparent visuals switch",
++        },
++        {
++          oldAnchor: POINTER_INTERACTIVITY_ANCHOR,
++          newPolicy: POINTER_INTERACTIVITY_POLICY,
++          description: "Linux avatar pointer interactivity",
++        },
++        {
++          oldAnchor: AVATAR_OVERLAY_WINDOW_OPTIONS_ANCHOR,
++          newPolicy: AVATAR_OVERLAY_WINDOW_OPTIONS_POLICY,
++          description: "Linux avatar transparent BrowserWindow options",
++        },
++        {
++          oldAnchor: TRANSPARENT_WINDOW_BACKDROP_ANCHOR,
++          newPolicy: TRANSPARENT_WINDOW_BACKDROP_POLICY,
++          description: "transparent auxiliary window backdrop",
++        },
++        {
++          oldAnchor: ELEMENT_SIZE_MESSAGE_ANCHOR,
++          newPolicy: ELEMENT_SIZE_MESSAGE_POLICY,
++          description: "avatar mascot shape IPC message",
++        },
++        {
++          oldAnchor: SET_ELEMENT_SIZE_ANCHOR,
++          newPolicy: SET_ELEMENT_SIZE_POLICY,
++          description: "avatar mascot shape state storage",
++        },
++        {
++          oldAnchor: WINDOW_SHAPE_INIT_ANCHOR,
++          newPolicy: WINDOW_SHAPE_INIT_POLICY,
++          description: "avatar window shape initialization",
++        },
++        {
++          oldAnchor: WINDOW_SHAPE_RESET_ANCHOR,
++          newPolicy: WINDOW_SHAPE_RESET_POLICY,
++          description: "avatar window shape reset",
++        },
++        {
++          oldAnchor: WINDOW_SHAPE_METHOD_ANCHOR,
++          newPolicy: WINDOW_SHAPE_METHOD_POLICY,
++          description: "avatar Linux setShape method",
++        },
++        {
++          oldAnchor: WINDOW_SHAPE_SYNC_ANCHOR,
++          newPolicy: WINDOW_SHAPE_SYNC_POLICY,
++          description: "avatar Linux setShape sync call",
++        },
++      ]),
++      patchTextFile(nativeFrameBundle, [
++        {
++          oldAnchor: NATIVE_FRAME_FALLBACK_ANCHOR,
++          newPolicy: NATIVE_FRAME_FALLBACK_POLICY,
++          description: "Linux avatar native surface fallback transparency",
++        },
++      ]),
++      patchTextFile(nativePageBundle, [
++        {
++          oldAnchor: NATIVE_PAGE_SHAPE_HELPER_ANCHOR,
++          newPolicy: NATIVE_PAGE_SHAPE_HELPER_POLICY,
++          description: "Linux avatar alpha shape helper",
++        },
++        {
++          oldAnchor: NATIVE_PAGE_SIZE_MESSAGE_ANCHOR,
++          newPolicy: NATIVE_PAGE_SIZE_MESSAGE_POLICY,
++          description: "Linux avatar alpha shape IPC payload",
++        },
++        {
++          oldAnchor: NATIVE_PAGE_SHAPE_READY_ANCHOR,
++          newPolicy: NATIVE_PAGE_SHAPE_READY_POLICY,
++          description: "Linux avatar alpha shape ready listener",
++        },
++      ]),
++      patchTextFile(codexAvatarBundle, [
++        {
++          oldAnchor: TEMPORARY_STATE_ANIMATION_ANCHOR,
++          newPolicy: PERSISTENT_STATE_ANIMATION_POLICY,
++          description: "persistent avatar state animation",
++        },
++      ]),
++    ];
++
++    execFileSync(ASAR_BIN, ["pack", extractDir, packedAsar, "--unpack", UNPACK_DIRS], { stdio: "inherit" });
++    renameSync(packedAsar, asarPath);
++
++    for (const summary of summaries) {
++      console.log(`${summary.changed ? "patched" : "already patched"} ${summary.filePath} ${summary.sha256}`);
++    }
 +  } finally {
 +    rmSync(tempRoot, { recursive: true, force: true });
 +  }
 +}
 +
-+main(process.argv[2]).catch((error) => {
-+  console.error(error);
-+  process.exit(1);
-+});
++const asarPath = process.argv[2];
++if (asarPath == null) {
++  console.error("Usage: patch-avatar-overlay-linux.mjs /path/to/resources/app.asar");
++  process.exit(2);
++}
++
++await patchAvatarOverlay(asarPath);
