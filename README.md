@@ -11,7 +11,7 @@
 当前有效文件：
 
 ```text
-codex-app-unofficial-avatar-overlay-linux-26.611.62324.patch
+02-codex-app-unofficial-avatar-overlay-linux.patch
 ```
 
 用途：
@@ -24,7 +24,7 @@ codex-app-unofficial-avatar-overlay-linux-26.611.62324.patch
 当前哈希：
 
 ```text
-codex-app-unofficial-avatar-overlay-linux-26.611.62324.patch
+02-codex-app-unofficial-avatar-overlay-linux.patch
 b76baba897000ceb643288c41491ff5b5df6da67107c8e3fd78371967b528680
 
 patch-avatar-overlay-linux.mjs
@@ -43,7 +43,7 @@ cd codex-app-unofficial
 应用当前 patch：
 
 ```bash
-patch -p1 < ../codex-app-unofficial-avatar-overlay-linux-26.611.62324.patch
+patch -p1 < ../02-codex-app-unofficial-avatar-overlay-linux.patch
 ```
 
 构建并安装：
@@ -105,7 +105,7 @@ sprite alpha    TrueColorAlpha
 ```bash
 git reset --hard
 git clean -fd
-patch -p1 < ../codex-app-unofficial-avatar-overlay-linux-26.611.62324.patch
+patch -p1 < ../02-codex-app-unofficial-avatar-overlay-linux.patch
 makepkg -Cf
 ```
 
