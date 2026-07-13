@@ -1,0 +1,333 @@
+diff --git a/.SRCINFO b/.SRCINFO
+index 54de6e0..fd831b1 100644
+--- a/.SRCINFO
++++ b/.SRCINFO
+@@ -1,7 +1,7 @@
+ pkgbase = openai-codex-desktop
+ 	pkgdesc = OpenAI Codex desktop app
+ 	pkgver = 26.707.31428
+-	pkgrel = 1
++	pkgrel = 4
+ 	url = https://developers.openai.com/codex/app/
+ 	arch = x86_64
+ 	license = custom
+@@ -24,6 +24,7 @@ pkgbase = openai-codex-desktop
+ 	source = Codex.desktop
+ 	source = patch-linux-open-targets.mjs
+ 	source = patch-linux-opaque-bg.mjs
++	source = patch-linux-avatar-overlay.mjs
+ 	sha256sums = ffdc351a507105d55d7464e3340302c758b8a54b926711c4b15bf373ccb47d64
+ 	sha256sums = ad0e29650140c49d0335b1d356596aa8166f12b758f418a98446130e3278f250
+ 	sha256sums = c7517f19083ddcb05f276904680eb2b11a6b5ecab778b8e4e5685a6d645b3f60
+@@ -31,5 +32,6 @@ pkgbase = openai-codex-desktop
+ 	sha256sums = 568228ade14afa0afd43eea6887547b7541e45e8438042367f628c5dae3aa810
+ 	sha256sums = b9303b892b3e0b35333e2cb96052905439105049efc5a8a3706e22a16dc30018
+ 	sha256sums = a181ace049a057654acdd789df60ee0f2b0435a119f8a2c53046bfe6aa4c4cb9
++	sha256sums = 2d37573062c38ae3443d38a5608cf87fa725cc43219b8f23680323d079cd76c8
+ 
+ pkgname = openai-codex-desktop
+diff --git a/PKGBUILD b/PKGBUILD
+index f7b053a..1f93274 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -4,7 +4,7 @@
+ 
+ pkgname=openai-codex-desktop
+ pkgver=26.707.31428
+-pkgrel=1
++pkgrel=4
+ pkgdesc="OpenAI Codex desktop app"
+ arch=('x86_64')
+ url="https://developers.openai.com/codex/app/"
+@@ -38,6 +38,7 @@ source=(
+   "Codex.desktop"
+   "patch-linux-open-targets.mjs"
+   "patch-linux-opaque-bg.mjs"
++  "patch-linux-avatar-overlay.mjs"
+ )
+ 
+ noextract=(
+@@ -52,8 +53,13 @@ sha256sums=('ffdc351a507105d55d7464e3340302c758b8a54b926711c4b15bf373ccb47d64'
+             '8f5d55f92df1d5a29c73fb97e73e35ca4de67cb0ce0ee8ffc8d0b99020a8ab41'
+             '568228ade14afa0afd43eea6887547b7541e45e8438042367f628c5dae3aa810'
+             'b9303b892b3e0b35333e2cb96052905439105049efc5a8a3706e22a16dc30018'
+-            'a181ace049a057654acdd789df60ee0f2b0435a119f8a2c53046bfe6aa4c4cb9')
++            'a181ace049a057654acdd789df60ee0f2b0435a119f8a2c53046bfe6aa4c4cb9'
++            '2d37573062c38ae3443d38a5608cf87fa725cc43219b8f23680323d079cd76c8')
+ 
++# 2026-07-13 苍朮
++# Purpose: prepare the current Codex app for Linux and apply the verified avatar overlay compatibility patch.
++# Parameters: none; makepkg provides srcdir and the downloaded source archives.
++# Returns: zero on a fully verified prepared source tree, non-zero when an upstream anchor or native build fails.
+ prepare() {
+   cd "${srcdir}"
+   rm -rf dmg app-extracted app.asar app.asar.unpacked native-build
+@@ -89,6 +95,7 @@ prepare() {
+ 
+   node "${srcdir}/patch-linux-open-targets.mjs" app-extracted
+   node "${srcdir}/patch-linux-opaque-bg.mjs" app-extracted
++  node "${srcdir}/patch-linux-avatar-overlay.mjs" app-extracted
+ 
+   local bs3_ver npty_ver
+   bs3_ver="$(node -p "require('${srcdir}/app-extracted/node_modules/better-sqlite3/package.json').version")"
+diff --git a/patch-linux-avatar-overlay.mjs b/patch-linux-avatar-overlay.mjs
+new file mode 100644
+index 0000000..4296075
+--- /dev/null
++++ b/patch-linux-avatar-overlay.mjs
+@@ -0,0 +1,255 @@
++#!/usr/bin/env node
++// SPDX-FileCopyrightText: 2026 苍朮
++// SPDX-License-Identifier: 0BSD
++
++import {
++  existsSync,
++  readFileSync,
++  readdirSync,
++  statSync,
++  writeFileSync,
++} from "node:fs";
++import { join } from "node:path";
++
++const TAG = "patch-linux-avatar-overlay";
++const appRoot = process.argv[2] ?? "app-extracted";
++const mainBuildRoot = join(appRoot, ".vite", "build");
++const webviewAssetsRoot = join(appRoot, "webview", "assets");
++
++/**
++ * 2026-07-13 苍朮
++ * Purpose: stop the patch immediately when the expected upstream structure is absent.
++ * @param {string} message - Diagnostic message describing the failed invariant.
++ * @returns {never} This function always terminates the process.
++ */
++function fail(message) {
++  console.error(`${TAG}: ${message}`);
++  process.exit(1);
++}
++
++/**
++ * 2026-07-13 苍朮
++ * Purpose: locate one current-version bundle by filename pattern.
++ * @param {string} directory - Directory containing generated bundles.
++ * @param {RegExp} pattern - Filename pattern that must match exactly once.
++ * @returns {string} Absolute or app-root-relative path to the unique bundle.
++ */
++function findUniqueFile(directory, pattern) {
++  if (!existsSync(directory) || !statSync(directory).isDirectory()) {
++    fail(`missing bundle directory: ${directory}`);
++  }
++  const matches = readdirSync(directory, { withFileTypes: true })
++    .filter((entry) => entry.isFile() && pattern.test(entry.name))
++    .map((entry) => join(directory, entry.name));
++  if (matches.length !== 1) {
++    fail(`expected one ${pattern} bundle in ${directory}, found ${matches.length}`);
++  }
++  return matches[0];
++}
++
++/**
++ * 2026-07-13 苍朮
++ * Purpose: count non-overlapping exact-string occurrences in a generated bundle.
++ * @param {string} source - Bundle source text.
++ * @param {string} needle - Exact minified anchor to count.
++ * @returns {number} Number of occurrences.
++ */
++function countOccurrences(source, needle) {
++  return source.split(needle).length - 1;
++}
++
++/**
++ * 2026-07-13 苍朮
++ * Purpose: replace one exact current-version anchor and reject ambiguous upgrades.
++ * @param {string} source - Bundle source text.
++ * @param {string} oldAnchor - Exact unpatched anchor.
++ * @param {string} newPolicy - Exact patched replacement.
++ * @param {string} description - Human-readable invariant name.
++ * @returns {string} Updated bundle source.
++ */
++function replaceExactlyOnce(source, oldAnchor, newPolicy, description) {
++  const oldCount = countOccurrences(source, oldAnchor);
++  const newCount = countOccurrences(source, newPolicy);
++  if (oldCount === 0 && newCount === 1) {
++    return source;
++  }
++  if (oldCount !== 1 || newCount !== 0) {
++    fail(`${description}: expected unpatched=1 and patched=0, found unpatched=${oldCount}, patched=${newCount}`);
++  }
++  return source.replace(oldAnchor, newPolicy);
++}
++
++/**
++ * 2026-07-13 苍朮
++ * Purpose: patch a bundle transactionally after all exact anchors are validated.
++ * @param {string} file - Bundle file to update.
++ * @param {Array<{oldAnchor:string,newPolicy:string,description:string}>} replacements - Exact replacements to apply.
++ * @returns {void} Writes the verified bundle in place.
++ */
++function patchBundle(file, replacements) {
++  const original = readFileSync(file, "utf8");
++  let updated = original;
++  for (const replacement of replacements) {
++    updated = replaceExactlyOnce(
++      updated,
++      replacement.oldAnchor,
++      replacement.newPolicy,
++      replacement.description,
++    );
++  }
++  for (const replacement of replacements) {
++    if (
++      countOccurrences(updated, replacement.oldAnchor) !== 0 ||
++      countOccurrences(updated, replacement.newPolicy) !== 1
++    ) {
++      fail(`${replacement.description}: post-patch verification failed`);
++    }
++  }
++  if (updated === original) {
++    console.log(`${TAG}: ${file} already patched`);
++    return;
++  }
++  writeFileSync(file, updated);
++  console.log(`${TAG}: patched ${file}`);
++}
++
++const mainFile = findUniqueFile(mainBuildRoot, /^main-[^/]+\.js$/);
++const avatarPageFile = findUniqueFile(
++  webviewAssetsRoot,
++  /^avatar-overlay-page-[^/]+\.js$/,
++);
++const codexAvatarFile = findUniqueFile(
++  webviewAssetsRoot,
++  /^codex-avatar-[^/]+\.js$/,
++);
++
++const pointerPolicyAnchor =
++  "let t=!this.pointerInteractive;if(this.mousePassthroughEnabled!==t)";
++const pointerPolicyLinux =
++  "let t=process.platform===`linux`?!1:!this.pointerInteractive;if(this.mousePassthroughEnabled!==t)";
++
++const elementMessageAnchor =
++  "case`avatar-overlay-element-size-changed`:e.setElementSize(t.id,{...n.elementSizeRevision==null?{}:{elementSizeRevision:n.elementSizeRevision},isTrayVisible:n.isTrayVisible,mascot:n.mascot,nativeCompositionEnabled:n.nativeCompositionEnabled,tray:n.tray});return;";
++const elementMessageLinux =
++  "case`avatar-overlay-element-size-changed`:e.setElementSize(t.id,{...n.elementSizeRevision==null?{}:{elementSizeRevision:n.elementSizeRevision},isTrayVisible:n.isTrayVisible,mascot:n.mascot,mascotShape:n.mascotShape??null,nativeCompositionEnabled:n.nativeCompositionEnabled,tray:n.tray});return;";
++
++const setElementSizeAnchor =
++  "setElementSize(e,{elementSizeRevision:t,isTrayVisible:n,mascot:r,nativeCompositionEnabled:i,tray:a}){let o=this.window;if(o==null||o.isDestroyed()||o.webContents.id!==e)return;this.pendingElementSizeRevision=t??null;";
++const setElementSizeLinux =
++  "setElementSize(e,{elementSizeRevision:t,isTrayVisible:n,mascot:r,mascotShape:__codexMascotShape,nativeCompositionEnabled:i,tray:a}){let o=this.window;if(o==null||o.isDestroyed()||o.webContents.id!==e)return;this.isTrayVisible=n??a!=null,this.mascotShape=__codexMascotShape??null,this.pendingElementSizeRevision=t??null;";
++
++const windowStateAnchor =
++  "this.pointerInteractive=!1,this.resolutionKey=null,this.traySize=null,process.platform===`darwin`?";
++const windowStateLinux =
++  "this.pointerInteractive=!1,this.resolutionKey=null,this.isTrayVisible=!1,this.mascotShape=null,this.windowShapeSignature=null,this.traySize=null,process.platform===`darwin`?";
++
++const windowResetAnchor =
++  "this.pointerInteractive=!1,this.mousePassthroughEnabled=!1,this.compositionHost.setOverlayWindow(null),this.broadcastOpenState()";
++const windowResetLinux =
++  "this.pointerInteractive=!1,this.mousePassthroughEnabled=!1,this.isTrayVisible=!1,this.mascotShape=null,this.windowShapeSignature=null,this.compositionHost.setOverlayWindow(null),this.broadcastOpenState()";
++
++const shapeMethodAnchor =
++  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(r7(i,t)){this.nativePositionController.position(e,t);return}let a=i.width===t.width&&i.height===t.height;e.setContentBounds(t,n&&!this.nativeCompositionSupported),this.nativePositionController.position(e,t),(r||!a)&&this.compositionHost.moveBackingCanvases()}sendLayoutToRenderer(e,t=null){";
++const shapeMethodLinux =
++  "setWindowBounds(e,t,n,r){if(e.isDestroyed())return;let i=e.getContentBounds();if(r7(i,t)){this.nativePositionController.position(e,t);return}let a=i.width===t.width&&i.height===t.height;e.setContentBounds(t,n&&!this.nativeCompositionSupported),this.nativePositionController.position(e,t),(r||!a)&&this.compositionHost.moveBackingCanvases()}/** 2026-07-13 苍朮: synchronize the Linux avatar window's visual and input shape; e is the BrowserWindow; returns void. */syncWindowShape(e){if(process.platform!==`linux`||e.isDestroyed()||this.layout==null)return;let t=this.mascotShape?.length?this.mascotShape.map(e=>({x:Math.round(this.layout.mascot.left+e.x),y:Math.round(this.layout.mascot.top+e.y),width:Math.ceil(e.width),height:Math.ceil(e.height)})):[{x:Math.round(this.layout.mascot.left),y:Math.round(this.layout.mascot.top),width:Math.ceil(this.layout.mascot.width),height:Math.ceil(this.layout.mascot.height)}],n=this.isTrayVisible&&this.layout.tray!=null?[...t,{x:Math.round(this.layout.tray.left),y:Math.round(this.layout.tray.top),width:Math.ceil(this.layout.tray.width),height:Math.ceil(this.layout.tray.height)}]:t,r=JSON.stringify(n);this.windowShapeSignature===r||(this.windowShapeSignature=r,e.setShape(n))}sendLayoutToRenderer(e,t=null){";
++
++const shapeSyncAnchor =
++  "this.setWindowBounds(e,a.windowBounds,n,r),this.compositionHost.updateMascotRect(a.mascot),this.sendLayoutToRenderer(e,i)";
++const shapeSyncLinux =
++  "this.setWindowBounds(e,a.windowBounds,n,r),this.syncWindowShape(e),this.compositionHost.updateMascotRect(a.mascot),this.sendLayoutToRenderer(e,i)";
++
++patchBundle(mainFile, [
++  {
++    oldAnchor: pointerPolicyAnchor,
++    newPolicy: pointerPolicyLinux,
++    description: "Linux pointer interactivity policy",
++  },
++  {
++    oldAnchor: elementMessageAnchor,
++    newPolicy: elementMessageLinux,
++    description: "avatar element-size IPC shape payload",
++  },
++  {
++    oldAnchor: setElementSizeAnchor,
++    newPolicy: setElementSizeLinux,
++    description: "avatar element-size shape state",
++  },
++  {
++    oldAnchor: windowStateAnchor,
++    newPolicy: windowStateLinux,
++    description: "avatar Linux shape initialization",
++  },
++  {
++    oldAnchor: windowResetAnchor,
++    newPolicy: windowResetLinux,
++    description: "avatar Linux shape reset",
++  },
++  {
++    oldAnchor: shapeMethodAnchor,
++    newPolicy: shapeMethodLinux,
++    description: "avatar Linux setShape method",
++  },
++  {
++    oldAnchor: shapeSyncAnchor,
++    newPolicy: shapeSyncLinux,
++    description: "avatar Linux setShape synchronization",
++  },
++]);
++
++const shapeHelperAnchor =
++  "var yn,$,bn,xn,Sn,Cn,wn,Tn,En,Dn,On,kn,An,jn,Mn,Nn,Pn;";
++const shapeHelperLinux =
++  "var yn,$,bn,xn,Sn,Cn,wn,Tn,En,Dn,On,kn,An,jn,Mn,Nn,Pn,__codexAvatarLinuxShapeCache=new Map,__codexAvatarLinuxShapeLoading=new Set;" +
++  "/** 2026-07-13 苍朮: merge live overlay controls into the Linux mascot shape; element is the mascot sprite root and rectangles are its alpha rectangles; returns combined shape rectangles. */" +
++  "function __codexAvatarLinuxAppendInteractiveShape(element,rectangles){let origin=element.getBoundingClientRect(),output=[...rectangles],padding=4,selectors=[`[data-testid='avatar-overlay-resize-hover-target']`,`[data-testid='avatar-overlay-notification-badge']`];for(let selector of selectors)for(let target of document.querySelectorAll(selector)){let style=getComputedStyle(target),bounds=target.getBoundingClientRect();if(style.display===`none`||style.visibility===`hidden`||bounds.width<=0||bounds.height<=0)continue;let left=Math.floor(bounds.left-origin.left)-padding,top=Math.floor(bounds.top-origin.top)-padding,right=Math.ceil(bounds.right-origin.left)+padding,bottom=Math.ceil(bounds.bottom-origin.top)+padding;output.push({x:left,y:top,width:right-left,height:bottom-top})}return output}" +
++  "/** 2026-07-13 苍朮: compute the union alpha shape for the active mascot animation; no parameters; returns shape rectangles or null while loading. */" +
++  "function __codexAvatarLinuxMascotShape(){" +
++  "let element=document.querySelector(`[data-avatar-overlay-hit-region=\"mascot\"] .codex-avatar-root`)??document.querySelector(`.codex-avatar-root`);" +
++  "if(element==null)return null;let style=getComputedStyle(element),match=(style.backgroundImage||``).match(/^url\\([\"']?(.*?)[\"']?\\)$/);" +
++  "if(match==null)return null;let imageUrl=match[1],bounds=element.getBoundingClientRect(),outputWidth=Math.ceil(bounds.width),outputHeight=Math.ceil(bounds.height);" +
++  "if(outputWidth<=0||outputHeight<=0)return null;let backgroundSize=(style.backgroundSize||``).trim().split(/\\s+/),columns=Math.max(1,Math.round(Number.parseFloat(backgroundSize[0])/100)||8),rows=Math.max(1,Math.round(Number.parseFloat(backgroundSize[1])/100)||9),state=element.getAttribute(`data-avatar-state`)??`idle`,stateSpec={failed:[5,8],idle:[0,6],jumping:[4,5],review:[8,6],running:[7,6],\"running-left\":[2,8],\"running-right\":[1,8],waving:[3,4],waiting:[6,6]}[state]??[0,6],stateRow=Math.max(0,Math.min(rows-1,stateSpec[0])),frameCount=Math.max(1,Math.min(columns,stateSpec[1])),cacheKey=`${imageUrl}|${outputWidth}x${outputHeight}|${columns}x${rows}|${state}`,cached=__codexAvatarLinuxShapeCache.get(cacheKey);" +
++  "if(cached!=null)return __codexAvatarLinuxAppendInteractiveShape(element,cached);if(!__codexAvatarLinuxShapeLoading.has(cacheKey)){__codexAvatarLinuxShapeLoading.add(cacheKey);let image=new Image;image.onload=()=>{try{let canvas=document.createElement(`canvas`);canvas.width=image.naturalWidth,canvas.height=image.naturalHeight;let context=canvas.getContext(`2d`,{willReadFrequently:!0});if(context==null)return;context.drawImage(image,0,0);let pixels=context.getImageData(0,0,canvas.width,canvas.height).data,cellWidth=Math.floor(canvas.width/columns),cellHeight=Math.floor(canvas.height/rows);if(cellWidth<=0||cellHeight<=0)return;let leftEdges=Array(cellHeight).fill(1/0),rightEdges=Array(cellHeight).fill(-1);" +
++  "for(let frameIndex=0;frameIndex<frameCount;frameIndex++){let frameX=frameIndex*cellWidth,rowOffset=((stateRow*cellHeight)*canvas.width+frameX)*4;for(let y=0;y<cellHeight;y++){let pixelOffset=rowOffset+y*canvas.width*4;for(let x=0;x<cellWidth;x++)pixels[pixelOffset+x*4+3]>16&&(x<leftEdges[y]&&(leftEdges[y]=x),x>rightEdges[y]&&(rightEdges[y]=x))}}" +
++  "let rectangles=[];for(let y=0;y<cellHeight;y++)if(rightEdges[y]>=leftEdges[y]){let x=Math.max(0,Math.floor(leftEdges[y]*outputWidth/cellWidth)-1),right=Math.min(outputWidth,Math.ceil((rightEdges[y]+1)*outputWidth/cellWidth)+1),top=Math.floor(y*outputHeight/cellHeight),height=Math.max(1,Math.ceil((y+1)*outputHeight/cellHeight)-top),previous=rectangles[rectangles.length-1];previous&&previous.x===x&&previous.width===right-x&&previous.y+previous.height===top?previous.height+=height:rectangles.push({x,y:top,width:right-x,height})}__codexAvatarLinuxShapeCache.set(cacheKey,rectangles),window.dispatchEvent(new Event(`codex-avatar-linux-shape-ready`))}catch{}finally{__codexAvatarLinuxShapeLoading.delete(cacheKey)}};image.onerror=()=>__codexAvatarLinuxShapeLoading.delete(cacheKey),image.src=imageUrl}return null}";
++
++const legacyMeasureAnchor =
++  "let t={...e,isTrayVisible:k&&J.length>0||_.caption!=null};gn(je.current,t)||(je.current=t,S.dispatchMessage(`avatar-overlay-element-size-changed`,{isTrayVisible:t.isTrayVisible,mascot:t.mascot,tray:t.tray}))},[k,J.length,_.caption]),Pe=";
++const legacyMeasureLinux =
++  "let t={...e,isTrayVisible:k&&J.length>0||_.caption!=null,mascotShape:__codexAvatarLinuxMascotShape()};gn(je.current,t)||(je.current=t,S.dispatchMessage(`avatar-overlay-element-size-changed`,{isTrayVisible:t.isTrayVisible,mascot:t.mascot,mascotShape:t.mascotShape,tray:t.tray}))},[k,J.length,_.caption]);(0,$.useEffect)(()=>{let e=()=>{je.current=null,Ne()},t=new MutationObserver(e),n=document.querySelector(`[data-avatar-overlay-hit-region='mascot']`)??document.body;return window.addEventListener(`codex-avatar-linux-shape-ready`,e),n&&t.observe(n,{subtree:!0,childList:!0,attributes:!0,attributeFilter:[`data-avatar-state`,`class`]}),()=>{window.removeEventListener(`codex-avatar-linux-shape-ready`,e),t.disconnect()}},[Ne]);let Pe=";
++
++const shapeEqualityAnchor =
++  "function gn(e,t){return e!=null&&e.isTrayVisible===t.isTrayVisible&&e.mascot.width===t.mascot.width&&e.mascot.height===t.mascot.height&&_n(e.tray,t.tray)}";
++const shapeEqualityLinux =
++  "function gn(e,t){return e!=null&&e.isTrayVisible===t.isTrayVisible&&e.mascot.width===t.mascot.width&&e.mascot.height===t.mascot.height&&_n(e.tray,t.tray)&&JSON.stringify(e.mascotShape??null)===JSON.stringify(t.mascotShape??null)}";
++
++patchBundle(avatarPageFile, [
++  {
++    oldAnchor: shapeHelperAnchor,
++    newPolicy: shapeHelperLinux,
++    description: "Linux avatar alpha-shape helper",
++  },
++  {
++    oldAnchor: legacyMeasureAnchor,
++    newPolicy: legacyMeasureLinux,
++    description: "Linux avatar shape measurement publisher",
++  },
++  {
++    oldAnchor: shapeEqualityAnchor,
++    newPolicy: shapeEqualityLinux,
++    description: "Linux avatar interactive-shape equality",
++  },
++]);
++
++const temporaryAnimationAnchor =
++  "let r=[...n,...n,...n];return{frames:[...r,...R],loopStartIndex:r.length}";
++const persistentAnimationPolicy = "return{frames:n,loopStartIndex:0}";
++
++patchBundle(codexAvatarFile, [
++  {
++    oldAnchor: temporaryAnimationAnchor,
++    newPolicy: persistentAnimationPolicy,
++    description: "persistent non-idle avatar animation",
++  },
++]);
++
++console.log(`${TAG}: all current-version avatar overlay patches verified`);
