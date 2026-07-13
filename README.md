@@ -1,49 +1,90 @@
-# codex-app-unofficial Linux patchset
+# openai-codex-desktop Linux 桌宠补丁
 
-这里保存本机用于调整 AUR `codex-app-unofficial` Linux 桌面版的 patch。
+这个仓库保存用于 AUR [`openai-codex-desktop`](https://aur.archlinux.org/packages/openai-codex-desktop) 的 Linux 桌宠兼容补丁。
 
-当前有效 patchset 基于 AUR `codex-app-unofficial 26.611.62324_launcher.29`。这个版本的 Codex Desktop 已经不再需要旧的左侧菜单/设置页重影修复，因此当前只维护桌宠修复。
+补丁面向 Arch Linux、X11 和 XFCE 环境，修复 Codex Desktop 桌宠窗口无法响应鼠标、透明区域命中异常，以及缩放柄和会话气泡控件被窗口 shape 裁剪的问题。同时保留非 idle 动画持续循环逻辑。
 
-这不是上游官方补丁，也不是长期自动兼容层。每次 AUR 或 Codex Desktop 上游更新后，都必须从干净工作树重新验证 patch 是否能无冲突应用，并确认 `app.asar` 内的 minified 锚点仍然唯一命中。
+这不是 OpenAI 或 AUR 上游官方补丁，也不是跨版本兼容层。Codex Desktop 或 AUR 包更新后，必须重新验证 minified bundle 锚点和运行时行为。
 
-## 当前 Patch
+## 兼容版本
 
-当前有效文件：
-
-```text
-02-codex-app-unofficial-avatar-overlay-linux.patch
-```
-
-用途：
-
-- 给 AUR `PKGBUILD` 增加 `patch-avatar-overlay-linux.mjs`，并在 `prepare()` 阶段 patch `resources/app.asar`。
-- 修复 Linux 下桌宠头像悬浮层的黑底、透明窗口背景、点击/穿透、窗口 shape 和动画播放逻辑。
-- 保留已定好的非 idle 状态持久动画：不再播放三轮后退回 idle。
-- 不包含左侧菜单/设置页重影修复。
-
-当前哈希：
+当前补丁只保证适用于以下原版 AUR 基线：
 
 ```text
-02-codex-app-unofficial-avatar-overlay-linux.patch
-b76baba897000ceb643288c41491ff5b5df6da67107c8e3fd78371967b528680
-
-patch-avatar-overlay-linux.mjs
-eac04e6664c09e6154a01858e5529f29616133957280b8fe5fb9b165e197e9c8
+AUR 仓库    https://aur.archlinux.org/openai-codex-desktop.git
+AUR 提交    d0feb50bf1cbc7ee68ab5eeca2da1f60374f0036
+原始版本    26.707.31428-1
+补丁后版本  26.707.31428-4
+Electron    42
 ```
+
+已验证环境：
+
+```text
+发行版      Arch Linux
+桌面环境    XFCE
+显示协议    X11
+X Server    支持 Composite / SHAPE
+```
+
+Wayland、其他桌面环境以及未来 AUR 版本尚未验证。
+
+## 补丁文件
+
+当前发布文件：
+
+```text
+openai-codex-desktop-avatar-overlay-linux-26.707.31428.patch
+```
+
+SHA-256：
+
+```text
+ccc8412118da3449df64b2fe2a55928a1511807dbb6f69ec31547acc54df777e
+```
+
+应用后新增的构建脚本：
+
+```text
+patch-linux-avatar-overlay.mjs
+```
+
+SHA-256：
+
+```text
+2d37573062c38ae3443d38a5608cf87fa725cc43219b8f23680323d079cd76c8
+```
+
+## 修复内容
+
+- Linux 下保持桌宠窗口可响应鼠标点击和拖动，不再依赖 X11 无效的鼠标事件转发行为。
+- 根据精灵图透明度生成桌宠窗口 shape，减少透明矩形区域拦截桌面点击。
+- 将 `48x48` 缩放悬停区和通知徽标加入窗口 shape，恢复缩放柄与会话气泡收起按钮。
+- 桌宠状态、控件增删或位置变化时重新计算并同步 shape。
+- 保留旧补丁中的非 idle 动画持续循环逻辑，不再播放三轮后回到 idle 动画。
+- 使用精确且唯一的 minified bundle 锚点；上游结构变化时构建会直接失败，避免静默生成未修复的软件包。
+
+AUR 包原有的 Linux 启动、背景和原生模块构建逻辑保持不变。本补丁不会额外替换这些已有功能。
 
 ## 使用方法
 
-准备内层 AUR 仓库：
+克隆原版 AUR 仓库：
 
 ```bash
-git clone https://aur.archlinux.org/codex-app-unofficial.git
-cd codex-app-unofficial
+git clone https://aur.archlinux.org/openai-codex-desktop.git
+cd openai-codex-desktop
 ```
 
-应用当前 patch：
+先检查补丁能否干净应用：
 
 ```bash
-patch -p1 < ../02-codex-app-unofficial-avatar-overlay-linux.patch
+git apply --check ../openai-codex-desktop-avatar-overlay-linux-26.707.31428.patch
+```
+
+应用补丁：
+
+```bash
+git apply ../openai-codex-desktop-avatar-overlay-linux-26.707.31428.patch
 ```
 
 构建并安装：
@@ -52,68 +93,82 @@ patch -p1 < ../02-codex-app-unofficial-avatar-overlay-linux.patch
 makepkg -Cfsi
 ```
 
-只验证构建、不安装：
+安装前应彻底退出正在运行的 Codex。Electron 不会热加载新安装的 `app.asar`。
+
+只构建、不安装：
 
 ```bash
-makepkg -Cf
+makepkg -Cfs
 ```
 
-关键 bundle patch 后哈希：
+## 已完成验证
+
+- 从 AUR 远端重新克隆干净仓库后，`git apply --check` 和 `git apply --index` 均通过。
+- 补丁应用后的 `PKGBUILD`、`.SRCINFO` 和 `patch-linux-avatar-overlay.mjs` 与实测构建版本逐字一致。
+- `makepkg --verifysource`、完整 `makepkg` 构建和 `.SRCINFO` 再生成检查通过。
+- 最终包内确认包含鼠标交互、动态 shape、缩放悬停区、通知徽标和动画循环修改。
+- XFCE/X11 运行时已确认桌宠能够点击、拖动和缩放，会话气泡控件不再被裁剪。
+- 连续 8 秒画面采样确认 idle 动画持续循环。
+
+本地验证构建包信息：
 
 ```text
-.vite/build/main-DLo8G5hp.js
-9c85ae88845f6d1427a3a9f3169508dcb1474432b5ff946d9c98b317db886e37
-
-webview/assets/avatar-overlay-native-page-Ct6lOFWD.js
-821f80fe4bcab2a95a966183af7a7904d1938059b823897d3f28626206628d7b
-
-webview/assets/avatar-overlay-native-frame-Bb-BcOSq.js
-3e618bb4da8846e8d0ed1e7542f675d3edb9a1b501e309b9c6061a52d0cef4b0
-
-webview/assets/codex-avatar-BYRhu0mv.js
-ff0c2691e541387b95e6de3492947d55085f514e14858dfd43667fa4f2c488b7
+openai-codex-desktop-26.707.31428-4-x86_64.pkg.tar.zst
+SHA-256: 803d524c64947669906eeb6ba74576b438c20b0794b38deb92d97420e68f9f24
 ```
 
-本机运行时排查确认：
-
-```text
-桌面环境        XFCE / X11
-X server        支持 Composite / SHAPE
-桌宠窗口        Depth: 32
-setShape        已生效
-sprite alpha    TrueColorAlpha
-```
+构建包未上传到本仓库；上述哈希仅用于复核同版本本地构建结果。
 
 ## 常见问题
 
-### patch 出现 `.rej`
+### `git apply --check` 失败
 
-不要继续 `makepkg`。
+不要强制应用，也不要继续构建。先确认 AUR 仓库处于干净状态，并核对其提交和 `pkgver` 是否与兼容版本一致。
 
-这通常表示当前 AUR `PKGBUILD` 或 `.SRCINFO` 已经和 patch 生成时不同，需要重新基于当前 AUR 版本生成 patch。
+如果 AUR 已更新，需要基于新版本重新定位 bundle、调整精确锚点并完整回归测试。
 
-### patch 命令成功但安装后没有生效
+### 安装后仍然运行旧版本
 
-检查 `makepkg` 日志里是否真的进入 `prepare()` 并执行 `patch-avatar-overlay-linux.mjs`。
-
-如果只看到 `patching file patch-avatar-overlay-linux.mjs`，但 `PKGBUILD/.SRCINFO` 的 hunk 失败，那么脚本虽然落到了目录里，却没有被 AUR 构建流程调用，最终安装包不会包含修复。
-
-## 维护提醒
-
-每次上游 AUR 更新后，先从干净工作树验证：
+检查已安装包版本：
 
 ```bash
-git reset --hard
-git clean -fd
-patch -p1 < ../02-codex-app-unofficial-avatar-overlay-linux.patch
-makepkg -Cf
+pacman -Q openai-codex-desktop
 ```
 
-如果修改 `patch-avatar-overlay-linux.mjs`：
+目标版本应为：
 
-- 必须同步更新 `PKGBUILD` 和 `.SRCINFO` 中对应 SHA256。
-- 必须重新生成外层 `.patch` 文件。
-- 必须用干净临时副本验证 `patch -p1 --dry-run`。
-- 必须从完整上游 tar 解包后实际运行脚本验证 `app.asar` 可被 patch。
+```text
+openai-codex-desktop 26.707.31428-4
+```
 
-如果 Codex Desktop 再次出现主窗口或设置页重影，应单独评估是否恢复或重写 `settings-overlap`。不要默认把它和桌宠 patch 绑回一起。
+确认已完全退出旧进程，再重新启动 Codex。
+
+### 动画像是停止了
+
+上游将 idle 动画帧时长统一放大了 6 倍，一个完整循环约为 6.6 秒，因此静止时间较明显。补丁保持这一上游速度，只让非 idle 状态持续循环。
+
+### 构建时提示锚点数量不正确
+
+补丁脚本要求每个原始锚点唯一命中。数量为 0 或大于 1 表示上游 bundle 已变化，当前补丁不再兼容；不要通过放宽检查绕过失败。
+
+## 更新维护
+
+每次 AUR 或 Codex Desktop 更新后，应在新的临时克隆中执行：
+
+```bash
+git clone https://aur.archlinux.org/openai-codex-desktop.git openai-codex-desktop-check
+cd openai-codex-desktop-check
+git apply --check ../openai-codex-desktop-avatar-overlay-linux-26.707.31428.patch
+```
+
+若修改 `patch-linux-avatar-overlay.mjs`：
+
+- 同步更新 `PKGBUILD` 和 `.SRCINFO` 中的 SHA-256。
+- 重新生成外层 `.patch` 文件。
+- 在干净 AUR 克隆中验证完整 patch 与 staged diff 一致。
+- 从上游应用归档重新解包并运行补丁脚本。
+- 完整构建安装包，并在 X11 中复测点击、拖动、缩放、气泡和动画。
+
+## 许可与声明
+
+补丁脚本使用 `0BSD` SPDX 标识。Codex Desktop、Electron 及 AUR 包中的其他文件遵循各自上游许可。
